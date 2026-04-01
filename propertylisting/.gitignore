@@ -1,0 +1,119 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# If using PostgreSQL or others, ignore dumps
+*.sql
+*.dump
+
+# Media files (user uploads)
+media/
+
+# Static files (if collected)
+staticfiles/
+
+# Environment variables
+.env
+.env.*
+*.env
+
+# Virtual environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python virtualenv (Poetry/Pipenv)
+.poetry/
+Pipfile.lock
+poetry.lock
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm / VS Code
+.idea/
+.vscode/
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# pyright
+.pyright/
+
+# Ruff / linting
+.ruff_cache/
+
+# Django migrations (optional – usually keep them)
+# */migrations/*
+# !*/migrations/__init__.py
+
+# Logs
+logs/
+*.log
+
+# Backup files
+*.bak
+*.swp
+*.swo

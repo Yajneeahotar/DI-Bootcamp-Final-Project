@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Real Estate</title>
+</head>
+<body>
+    <!-- properties.html -->
+    <div class="cards">
+    {% for property in properties_list %}
+        <article class="card">
+            <img src="{{ property.image.url }}" alt="{{ property.title }}">
+            <h3>{{ property.title }}</h3>
+            <p>{{ property.location }}</p>
+            <p>Rs {{ property.price_per_month }} per month</p>
+            <p>{{ property.description }}</p>
+        </article>
+    {% endfor %}
+    </div>
+</body>
+</html>
