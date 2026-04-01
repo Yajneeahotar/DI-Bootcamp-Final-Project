@@ -1,21 +1,51 @@
+{% load static %}
 <!DOCTYPE html>
 
 <html>
 <head>
     <title>Real Estate</title>
+    <link rel="stylesheet" href="{% static 'css/properties.css' %}">
 </head>
 <body>
-    <!-- properties.html -->
+<!-- properties.html -->
     <div class="cards">
     {% for property in properties_list %}
         <article class="card">
-            <img src="{{ property.image.url }}" alt="{{ property.title }}">
+            <img src="{%static 'images/Golden_Horizon_Residence.png'%}" alt="{{ property.title }}">
             <h3>{{ property.title }}</h3>
             <p>{{ property.location }}</p>
-            <p>Rs {{ property.price_per_month }} per month</p>
+            <p>MUR {{ property.price_per_month }} per month</p>
             <p>{{ property.description }}</p>
         </article>
     {% endfor %}
     </div>
+
+<!--Footer-->
+    <footer class="footer">
+        <div class="footer-content">
+            
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@realestate.com</p>
+                <p>Phone: +230 123 4567</p>
+                <p>Location: Mauritius</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="socials">
+                    <a href="https://facebook.com" target="_blank">
+                        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook">
+                    </a>
+                    <a href="https://instagram.com" target="_blank">
+                        <img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" alt="Instagram">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Real Estate. All rights reserved.</p>
+        </div>
+    </footer>
 </body>
 </html>
