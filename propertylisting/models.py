@@ -7,3 +7,4 @@ class Properties(models.Model):
     price_per_month = models.DecimalField(max_digits=12, decimal_places=2)
     description = models.TextField()
     image = models.ImageField()
+    owner = models.CharField(max_length=200)
