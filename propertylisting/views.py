@@ -6,3 +6,4 @@ from .models import Properties
 def property_listings(request):
     listings = Properties.objects.all().order_by("-id")
     return render(request, "properties.html", {"properties_list": listings})
+
