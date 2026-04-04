@@ -22,8 +22,9 @@
             <img src="{%static 'images/Golden_Horizon_Residence.png'%}" alt="{{ property.title }}">
             <h3>{{ property.title }}</h3>
             <p>{{ property.location }}</p>
-            <p>MUR {{ property.price_per_month }}</p>
+            <p>MUR {{ property.price }} </p>
             <p>{{ property.description }}</p>
+            
         </article>
     {% endfor %}
     </div>
