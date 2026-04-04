@@ -9,3 +9,4 @@ def property_listings(request):
 
 def properties(request):
     return render(request, "properties.html")
+

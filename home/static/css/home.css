@@ -114,16 +114,19 @@ body {
     min-width: 180px;
 }
 
-.filter-section button {
+.filter-section .filter-button {
     padding: 10px 20px;
     background: #333;
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
 }
 
-.filter-section button:hover {
+
+.filter-section .filter-button:hover {
     background: #555;
 }
 
