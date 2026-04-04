@@ -9,11 +9,19 @@
 <body>
 <!-- Navbar -->
     <div class="navbar">
-        <a href="#" class="logo">YK Real Estate Management</a>
-        <a href="{% url 'homepage' %}">Home</a>
-        <a href="{% url 'properties' %}">Properties</a>
-        <a href="{% url 'contactus' %}">Contact</a>
-        <a href="#">About</a>
+    <!-- Left side  -->
+        <div class="nav-left">
+            <a href="#" class="logo">YK Real Estate Management</a>
+            <a href="{% url 'homepage' %}">Home</a>
+            <a href="{% url 'properties' %}">Properties</a>
+            <a href="{% url 'contactus' %}">Contact</a>
+            <a href="#">About</a>
+        </div>
+    <!-- Right side -->
+        <div class="nav-right">
+            <a href="#"class="btn-login">Login</a>
+            <a href="#"class="btn-register">Register</a>
+        </div>
     </div>
 <!-- properties.html -->
     <div class="cards">
