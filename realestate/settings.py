@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'propertylisting',
     'contact',
     'home',
+    'accounts',
   
 ]
 

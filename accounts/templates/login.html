@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    
+<style>
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #333;
+        padding: 0.5rem 1rem;
+        backdrop-filter: blur(8px);
+    }
+
+    .nav-left a {
+        margin-right: 1rem;
+    }
+
+    .nav-right a {
+        margin-left: 1rem;
+        padding: 8px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        /*color: #333; 
+        background-color: white; */
+        font-weight: bold;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    .nav-right a:hover {
+        background-color: #ddd; 
+        color: #000; 
+    }
+
+    .navbar a {
+        float: left;
+        color: #f2f2f2;
+        text-align: center;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        font-size: 1rem;
+    }
+
+    .navbar a:hover {
+        background-color: #ddd;
+        color: black;
+    }
+
+    .navbar .logo {
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    body {
+        
+        margin: 0;
+        padding: 0;
+    }
+/* Login Container  */
+    .container {
+        width: 400px;
+        max-width: 90%;
+        margin: 60px auto;
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Title */
+    h2 {
+        text-align: center;
+        margin-top: 40px;
+        color: #333;
+    }
+
+    /* Labels */
+    .container label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+    }
+
+    /* Inputs */
+    .container input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    /* Focus effect */
+    .container input:focus {
+        border-color: #007BFF;
+        outline: none;
+    }
+
+    /* Button */
+    .container button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+        background-color: #000000;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .container button:hover {
+        background-color: #c3c7ca;
+        color: black;
+    }
+
+    /* Error message */
+    p[style] {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    /* Signup text */
+    body > p {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+    /*Footer*/
+    .footer {
+        background: #222;
+        color: #fff;
+        margin-top: 40px;
+    }
+
+    .footer-content {
+        display: flex;
+        justify-content: space-between;
+        padding: 30px 20px;
+        flex-wrap: wrap;
+    }
+
+    .footer-section {
+        max-width: 300px;
+    }
+
+    .footer-section h3 {
+        margin-bottom: 10px;
+    }
+
+    .footer-section p {
+        margin: 5px 0;
+        font-size: 14px;
+    }
+
+    .socials {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .socials img {
+        width: 30px;
+        height: 30px;
+        transition: transform 0.2s;
+    }
+
+    .socials img:hover {
+        transform: scale(1.2);
+    }
+
+    .footer-bottom {
+        text-align: center;
+        padding: 10px;
+        background: #111;
+        font-size: 13px;
+    }
+     
+</style>
+</head>
+<body>
+<!-- Navbar -->
+    <div class="navbar">
+    <!-- Left side  -->
+        <div class="nav-left">
+            <a href="#" class="logo">YK Real Estate Management</a>
+            <a href="{% url 'homepage' %}">Home</a>
+            <a href="{% url 'properties' %}">Properties</a>
+            <a href="{% url 'contactus' %}">Contact</a>
+            <a href="#">About</a>
+        </div>
+    <!-- Right side -->
+        <div class="nav-right">
+            <a href="#"class="btn-register">Register</a>
+        </div>
+    </div>
+<!--Login Form-->
+    <div class="container">
+        <h2>Login to Your Account</h2>
+
+        {% if form.errors %}
+            <p style="color:red;">Invalid username or password. Please try again.</p>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label><b>Username</b></label>
+                <input type="text" name="username" placeholder="Enter Username" required>
+            </div>
+
+            <div class="form-group">
+                <label><b>Password</b></label>
+                <input type="password" name="password" placeholder="Enter Password" required>
+            </div>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <p>Don't have an account?</p>
+    </div>
+<!--Footer-->
+    <footer class="footer">
+        <div class="footer-content">
+            
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@realestate.com</p>
+                <p>Phone: +230 123 4567</p>
+                <p>Location: Mauritius</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="socials">
+                    <a href="https://facebook.com" target="_blank">
+                        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook">
+                    </a>
+                    <a href="https://instagram.com" target="_blank">
+                        <img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" alt="Instagram">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Real Estate. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
