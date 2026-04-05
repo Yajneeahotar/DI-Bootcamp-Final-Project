@@ -10,15 +10,24 @@
 <body>
 <!-- Navbar -->
     <div class="navbar">
-        <a href="#" class="logo">YK Real Estate Management</a>
-        <a href="{% url 'homepage' %}">Home</a>
-        <a href="{% url 'properties' %}">Properties</a>
-        <a href="{% url 'contactus' %}">Contact</a>
-        <a href="#">About</a>
+    <!-- Left side  -->
+        <div class="nav-left">
+            <a href="#" class="logo">YK Real Estate Management</a>
+            <a href="{% url 'homepage' %}">Home</a>
+            <a href="{% url 'properties' %}">Properties</a>
+            <a href="{% url 'contactus' %}">Contact</a>
+            <a href="#">About</a>
+        </div>
+    <!-- Right side -->
+        <div class="nav-right">
+            <a href="#"class="btn-login">Login</a>
+            <a href="#"class="btn-register">Register</a>
+        </div>
     </div>
     <div class="contact-container">
         <h2>Contact Us</h2>
         <form class="contact-form" action="#" method="post">
+            {% csrf_token %}
             <div class="form-group">
                 <label for="name">Name</label>
                 <input type="text" id="name" name="name" placeholder="Your Name" required>
