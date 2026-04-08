@@ -1,10 +1,9 @@
 {% load static %}
 <!DOCTYPE html>
-
 <html>
 <head>
-    <title>Real Estate</title>
-    <link rel="stylesheet" href="{% static 'css/properties.css' %}">
+    <title>Register</title>
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
 </head>
 <body>
 <!-- Navbar -->
@@ -19,24 +18,28 @@
         </div>
     <!-- Right side -->
         <div class="nav-right">
-            <a href="{% url 'login' %}"class="btn-login">Login</a>
-            <a href="{% url 'register' %}"class="btn-register">Register</a>
+            <a href="#"class="btn-register">Register</a>
         </div>
     </div>
-<!-- properties.html -->
-    <div class="cards">
-    {% for property in properties_list %}
-        <article class="card">
-            <img src="{%static 'images/Golden_Horizon_Residence.png'%}" alt="{{ property.title }}">
-            <h3>{{ property.title }}</h3>
-            <p>{{ property.location }}</p>
-            <p>MUR {{ property.price }} </p>
-            <p>{{ property.description }}</p>
-            
-        </article>
-    {% endfor %}
-    </div>
 
+ <div class="container">
+    <h2>Create an Account</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p class="alert">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">Register</button>
+    </form>
+
+    <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+</div>
 <!--Footer-->
     <footer class="footer">
         <div class="footer-content">
@@ -64,5 +67,6 @@
             <p>&copy; 2026 Real Estate. All rights reserved.</p>
         </div>
     </footer>
+
 </body>
 </html>
