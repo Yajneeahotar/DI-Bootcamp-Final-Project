@@ -30,13 +30,23 @@ body::before {
     margin-right: 1rem;
 }
 
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.welcome-text {
+    color: #f2f2f2;
+    font-size: 1rem;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
 .nav-right a {
-    margin-left: 1rem;
     padding: 8px 15px;
     border-radius: 5px;
     text-decoration: none;
-    /*color: #333; 
-    background-color: white; */
     font-weight: bold;
     transition: background 0.3s, color 0.3s;
 }
@@ -69,7 +79,7 @@ body::before {
 .footer {
     background: #222;
     color: #fff;
-    margin-top: 40px;
+    margin-top: auto;
 }
 
 .footer-content {
@@ -142,9 +152,11 @@ body::before {
 }
 
 body {
-    
     margin: 0;
     padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .contact-container {

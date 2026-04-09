@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import RegisterForm
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -40,3 +40,7 @@ def register_view(request):
         form = RegisterForm()
 
     return render(request, "register.html", {"form": form})
+
+def logout_view(request):
+    logout(request)
+    return redirect("homepage")
