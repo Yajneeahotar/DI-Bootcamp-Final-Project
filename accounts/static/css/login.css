@@ -48,10 +48,10 @@
     body {
     margin: 0;
     padding: 0;
-    position: relative;
-    height: 100vh;
-    overflow: hidden;
-}
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    }
 
 /* Background layer */
 body::before {
@@ -147,10 +147,10 @@ body::before {
     }
     /*Footer*/
     .footer {
-        background: #222;
-        color: #fff;
-        margin-top: 40px;
-    }
+    background: #222;
+    color: #fff;
+    margin-top: auto;   /* was 40px */
+    }   
 
     .footer-content {
         display: flex;

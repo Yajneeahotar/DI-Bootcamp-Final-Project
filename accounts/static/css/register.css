@@ -6,9 +6,11 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    /*font-family: Arial, sans-serif;*/
     position: relative;
     min-height: 100vh;
+    display: flex;           
+    flex-direction: column;  
 }
 
 /* Background image with overlay */
@@ -167,7 +169,7 @@ body::before {
 .footer {
     background: #222;
     color: #fff;
-    margin-top: 40px;
+    margin-top: auto;   /* was 40px */
 }
 
 .footer-content {

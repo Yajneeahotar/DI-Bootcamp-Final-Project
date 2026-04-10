@@ -59,9 +59,11 @@
 }
 
 body {
-    
     margin: 0;
     padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 /* Image */
 .backgroundimage {
@@ -145,7 +147,7 @@ body {
 .footer {
     background: #222;
     color: #fff;
-    margin-top: 40px;
+    margin-top: auto;
 }
 
 .footer-content {
