@@ -72,7 +72,8 @@ body::before {
 }
 
 .nav-menu {
-    /*display: none;*/
+    display: none;
+    display: block !important;
     position: absolute;
     top: 70px;
     right: 20px;

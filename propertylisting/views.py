@@ -16,7 +16,7 @@ def create_property(request):
         form = PropertiesForm(request.POST, request.FILES) #This handles text data from form and images
         if form.is_valid():
             form.save()
-            return redirect('property_list')
+            return redirect('properties')
     else:
         form = PropertiesForm()
 
