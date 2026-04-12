@@ -40,7 +40,7 @@
  <!-- HAMBURGER MENU DROPDOWN -->
     <div id="navMenu" class="nav-menu">
         {% if user.is_authenticated %}
-            <a href="#">➕ Create Property</a>
+            <a href="{% url 'create_property' %}">➕ Create Property</a>
             <a href="#">✏️ Edit Property</a>
             <a href="#">🗑️ Delete Property</a>
         {% endif %}
