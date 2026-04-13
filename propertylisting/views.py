@@ -13,9 +13,11 @@ def properties(request):
 
 def create_property(request):
     if request.method == "POST":
-        form = PropertiesForm(request.POST, request.FILES) #This handles text data from form and images
+        form = PropertiesForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            property_record= form.save(commit=False)
+            property_record.owner = request.user.username
+            property_record.save()
             return redirect('properties')
     else:
         form = PropertiesForm()
