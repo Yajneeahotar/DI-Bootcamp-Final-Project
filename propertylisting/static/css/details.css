@@ -1,4 +1,4 @@
-/* Background layer */
+* Background layer */
 body::before {
     content: "";
     position: fixed;
@@ -104,42 +104,146 @@ body {
     display: flex;
     flex-direction: column;
 }
-.cards {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 20px; 
-    padding: 20px;
-}
 
-.card {
-    background: #fff;
-    border-radius: 10px;
+/* CONTAINER */
+.detail_container {
+    width: 90%;
+    max-width: 500px;
+    margin: 60px auto;
+    padding: 0;
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    padding-bottom: 15px;
-    transition: transform 0.2s ease;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
 }
 
-.card:hover {
-    transform: translateY(-5px);
+/* HEADER */
+.detail_container h2 {
+    margin: 0;
+    padding: 16px 20px;
+    background: #000;
+    color: #fff;
+    font-size: 20px;
+
+    border-radius: 18px 18px 0 0;
+}
+.form_body {
+    padding: 25px;
 }
 
-.card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
+/* TOGGLES */
+.toggle_row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
 }
 
-.card h3 {
-    margin: 10px;
-    font-size: 18px;
+/* SWITCH */
+.switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
 }
 
-.card p {
-    margin: 5px 10px;
-    color: #555;
+.switch input {
+    display: none;
+}
+
+.switch span {
+    width: 40px;
+    height: 20px;
+    background: #ccc;
+    border-radius: 20px;
+    position: relative;
+}
+
+.switch span::after {
+    content: "";
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.switch input:checked + span {
+    background: #000;
+}
+
+.switch input:checked + span::after {
+    transform: translateX(20px);
+}
+
+/* FORM STACK */
+.form_vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* FIELD */
+.field {
+    display: flex;
+    flex-direction: column;
+}
+
+/* LABEL */
+.field label {
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: #444;
+}
+
+/* INPUT */
+.field input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
     font-size: 14px;
 }
+
+/* FOCUS */
+.field input:focus {
+    border-color: #000;
+    outline: none;
+}
+
+/* BUTTON */
+.detail_container button {
+    margin-top: 25px;
+    padding: 12px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.detail_container button:hover {
+    background: #333;
+}
+/* BUTTON */
+.create_container button {
+    margin-top: 25px;
+    width: 100%;
+    padding: 12px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.create_container button:hover {
+    background: #333;
+}
+
+
 /*Footer*/
 .footer {
     background: #222;

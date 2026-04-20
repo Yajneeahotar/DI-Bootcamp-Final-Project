@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import Properties
 from .forms import PropertiesForm
+from django.contrib.auth.decorators import login_required
 	
 #---retrieve all records properties table ---#
 # --- Store in listings and send to HTML ---#
@@ -11,6 +12,7 @@ def property_listings(request):
 def properties(request):
     return render(request, "properties.html")
 
+@login_required
 def create_property(request):
     if request.method == "POST":
         form = PropertiesForm(request.POST, request.FILES)
@@ -23,3 +25,6 @@ def create_property(request):
         form = PropertiesForm()
 
     return render(request, 'create.html', {'form': form})
+
+def details(request):
+    return render(request, "details.html")

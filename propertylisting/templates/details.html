@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Real Estate</title>
+    <link rel="stylesheet" href="{% static 'css/details.css' %}">
+</head>
+<body>
+<!-- Navbar -->
+    <div class="navbar">
+    <!-- Left side  -->
+        <div class="nav-left">
+            <a href="#" class="logo">YK Real Estate Management</a>
+            <a href="{% url 'homepage' %}">Home</a>
+            <a href="{% url 'properties' %}">Properties</a>
+            <a href="{% url 'contactus' %}">Contact</a>
+            <a href="#">About</a>
+        </div>
+    <!-- Right side -->
+        <div class="nav-right">
+
+            {% if user.is_authenticated %}
+                <span class="welcome-text">Welcome, {{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="btn-register">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn-login">Login</a>
+                <a href="{% url 'register' %}" class="btn-register">Register</a>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <div class="hamburger" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+ <!-- HAMBURGER MENU DROPDOWN -->
+    <div id="navMenu" class="nav-menu">
+        {% if user.is_authenticated %}
+            <a href="{% url 'create_property' %}">➕ Create Property</a>
+            <a href="#">✏️ Edit Property</a>
+            <a href="#">🗑️ Delete Property</a>
+        {% endif %}
+    </div>
+
+    <div class="detail_container">
+        <h2>Property information</h2>
+        <div class="form_body">
+            <form>
+
+                <!-- Toggles -->
+                <div class="toggle_row">
+                    <label class="switch"><input type="checkbox"><span></span> Villa</label>
+                    <label class="switch"><input type="checkbox"><span></span> Apartment</label>
+                    <label class="switch"><input type="checkbox"><span></span> Duplex</label>
+                </div>
+
+                <!-- Fields -->
+                <div class="form_vertical">
+                    <div class="field">
+                        <label>Price</label>
+                        <input type="text">
+                    </div>
+
+                    <div class="field">
+                        <label>Location</label>
+                        <input type="text">
+                    </div>
+
+                    <div class="field">
+                        <label>Land area (m²)</label>
+                        <input type="text">
+                    </div>
+
+                    <div class="field">
+                        <label>Number of rooms</label>
+                        <input type="text">
+                    </div>
+
+                    <div class="field">
+                        <label>Number of bathrooms</label>
+                        <input type="text">
+                    </div>
+                </div>
+
+                <button type="submit">Save</button>
+            </form>
+        </div>
+    </div>    
+<!--Footer-->
+    <footer class="footer">
+        <div class="footer-content">
+            
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@realestate.com</p>
+                <p>Phone: +230 123 4567</p>
+                <p>Location: Mauritius</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="socials">
+                    <a href="https://facebook.com" target="_blank">
+                        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook">
+                    </a>
+                    <a href="https://instagram.com" target="_blank">
+                        <img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" alt="Instagram">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Real Estate. All rights reserved.</p>
+        </div>
+    </footer>
+
+        <script>
+            function toggleMenu() {
+                document.getElementById("navMenu").classList.toggle("active");
+            }
+        </script>
+</body>
+</html>
