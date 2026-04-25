@@ -61,9 +61,16 @@
 
                     <!-- Always visible content -->
                     <div class="card-content">
-                        <h3>{{ property.title }}</h3>
+                        <div class="card-header">
+                            <h3>{{ property.title }}</h3>
+                        </div>
                         <p class="location">{{ property.location }}</p>
+                        <div class="card-meta">
+                            <span class="meta-item">🛏 {{ property.bedrooms }} bedrooms</span>
+                            <span class="meta-item">📐 {{ property.area }} m²</span>
+                        </div>
                         <p class="price">MUR {{ property.price }}</p>
+                        <div class="favorite-icon">♡</div>
                     </div>
                 </article>
             </a>

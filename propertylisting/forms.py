@@ -9,5 +9,8 @@ class PropertiesForm(forms.ModelForm):
             "location",
             "price",
             "description",
+            "rooms",
+            "bedrooms",
+            "area",
             "image",
         ]
