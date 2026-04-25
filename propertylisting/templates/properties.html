@@ -47,23 +47,27 @@
     </div>
 <!-- properties.html -->
     <div class="cards">
-    {% for property in properties_list %}
-        <a href="{% url 'property_info' property.id %}" class="card-link">
-            <article class="card">
-                <div class="img-wrapper">
-                    <img src="{{ property.image.url }}" alt="{{ property.title }}">
+        {% for property in properties_list %}
+            <a href="{% url 'property_info' property.id %}" class="card-link">
+                <article class="card">
+                    <div class="img-wrapper">
+                        <img src="{{ property.image.url }}" alt="{{ property.title }}">
 
-                    <div class="card-overlay">
-                        <div class="overlay-content">
-                            <h3>{{ property.title }}</h3>
-                            <p class="location">{{ property.location }}</p>
-                            <p class="price">MUR {{ property.price }}</p>
+                        <!-- Hover overlay ONLY -->
+                        <div class="card-overlay">
+                            <div class="discover">Discover property</div>
                         </div>
                     </div>
-                </div>
-            </article>
-        </a>
-    {% endfor %}
+
+                    <!-- Always visible content -->
+                    <div class="card-content">
+                        <h3>{{ property.title }}</h3>
+                        <p class="location">{{ property.location }}</p>
+                        <p class="price">MUR {{ property.price }}</p>
+                    </div>
+                </article>
+            </a>
+        {% endfor %}
     </div>
 
 <!--Footer-->
