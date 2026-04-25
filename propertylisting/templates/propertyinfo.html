@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Real Estate</title>
+    <link rel="stylesheet" href="{% static 'css/propertyinfo.css' %}">
+</head>
+<body>
+    <div class="container">
+
+    <!-- LEFT SIDE -->
+    <div class="left">
+
+        <div class="gallery">
+            <img class="main-img" src="{{ property.image.url }}">
+            <img src="{{ property.image.url }}">
+            <img src="{{ property.image.url }}">
+        </div>
+
+        <h1 class="title">{{ property.title }}</h1>
+
+        <div class="sub-info">
+            <span>🏠 {{ property.rooms }} rooms</span>
+            <span>🛏 {{ property.bedrooms }} bedrooms</span>
+            <span>📐 {{ property.area }} m²</span>
+        </div>
+
+        <div class="price">MUR {{ property.price }}</div>
+
+        <p class="description">{{ property.description }}</p>
+
+        <a href="#">Learn more</a>
+
+        <table class="info-table">
+            <tr><td>Location</td><td>{{ property.location }}</td></tr>
+            <tr><td>Type</td><td>House</td></tr>
+            <tr><td>Price</td><td>{{ property.price }}</td></tr>
+        </table>
+
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right">
+        <div class="contact-agency-card">
+            <div class="contact-header">
+                <h3>Contact Agency</h3>
+                <p>Get more information about this property</p>
+            </div>
+            
+            <form>
+                <input type="text" placeholder="Your Name">
+                <input type="email" placeholder="Your Email">
+                <textarea placeholder="Your Message"></textarea>
+                <button class="submit-btn">Send Message</button>
+            </form>
+</div>
+
+    </div>
+
+</div>
+</body>
+</html>

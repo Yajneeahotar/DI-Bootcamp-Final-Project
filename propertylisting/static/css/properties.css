@@ -73,7 +73,6 @@ body::before {
 
 .nav-menu {
     display: none;
-    display: block !important;
     position: absolute;
     top: 70px;
     right: 20px;
@@ -91,9 +90,13 @@ body::before {
     color: black;
 }
 
-
-
 .nav-menu.active {
+    display: block;
+}
+
+.card-link {
+    color: inherit;
+    text-decoration: none;
     display: block;
 }
 

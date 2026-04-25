@@ -48,14 +48,21 @@
 <!-- properties.html -->
     <div class="cards">
     {% for property in properties_list %}
-        <article class="card">
-            <img src="{%static 'images/Golden_Horizon_Residence.png'%}" alt="{{ property.title }}">
-            <h3>{{ property.title }}</h3>
-            <p>{{ property.location }}</p>
-            <p>MUR {{ property.price }} </p>
-            <p>{{ property.description }}</p>
-            
-        </article>
+        <a href="{% url 'property_info' property.id %}" class="card-link">
+            <article class="card">
+                <div class="img-wrapper">
+                    <img src="{{ property.image.url }}" alt="{{ property.title }}">
+
+                    <div class="card-overlay">
+                        <div class="overlay-content">
+                            <h3>{{ property.title }}</h3>
+                            <p class="location">{{ property.location }}</p>
+                            <p class="price">MUR {{ property.price }}</p>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </a>
     {% endfor %}
     </div>
 

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Properties
 from .forms import PropertiesForm
 from django.contrib.auth.decorators import login_required
@@ -28,3 +28,8 @@ def create_property(request):
 
 def details(request):
     return render(request, "details.html")
+
+#further propety information while clicking on property cards
+def property_info(request, id):
+    property = get_object_or_404(Properties, id=id)
+    return render(request, 'propertyinfo.html', {'property': property})
