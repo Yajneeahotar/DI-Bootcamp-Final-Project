@@ -70,8 +70,10 @@
                             <span class="meta-item">📐 {{ property.area }} m²</span>
                         </div>
                         <p class="price">MUR {{ property.price }}</p>
-                        <div class="favorite-icon">♡</div>
-                    </div>
+                        <label class="favorite-wrapper">
+                            <input type="checkbox" class="favorite-toggle">
+                            <span class="favorite-icon">♡</span>
+                        </label>
                 </article>
             </a>
         {% endfor %}

@@ -7,7 +7,7 @@ body::before {
     width: 100%;
     height: 100%;
 
-    background-image: url("../images/backgroundbody.jpg");
+    /*background-image: url("../images/backgroundbody.jpg");*/
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -171,9 +171,11 @@ body {
 }
 .cards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 20px; 
-    padding: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 90%;       
+    margin: 0 auto;
+    padding: 20px 0;
 }
 
 .card {
@@ -434,3 +436,58 @@ body {
     }
 }
 
+
+
+
+
+.favorite-wrapper {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    cursor: pointer;
+      z-index: 10;
+}
+
+/* Hide checkbox */
+.favorite-toggle {
+    display: none;
+}
+
+/* Default heart */
+.favorite-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    font-size: 20px;
+    color: #e63946;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease;
+}
+
+/* Hover effect */
+.favorite-wrapper:hover .favorite-icon {
+    transform: scale(1.05);
+}
+
+/* When checked → filled heart */
+.favorite-toggle:checked + .favorite-icon {
+    content: "♥";
+}
+
+/* Change symbol */
+.favorite-toggle:checked + .favorite-icon::before {
+    content: "♥";
+}
+
+/* Remove original symbol when checked */
+.favorite-toggle:checked + .favorite-icon {
+    font-size: 0;
+}
+
+.favorite-toggle:checked + .favorite-icon::before {
+    font-size: 20px;
+}
