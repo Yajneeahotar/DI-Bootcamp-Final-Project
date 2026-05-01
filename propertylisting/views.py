@@ -3,23 +3,45 @@ from .models import Properties, Favorite
 from .forms import PropertiesForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-	
+'''def property_listings(request):
+    listings = Properties.objects.all().order_by("-id")
+    return render(request, "properties.html", {"properties_list": listings})#---retrieve all records properties table ---#'''
+
 #---retrieve all records properties table ---#
 # --- Store in listings and send to HTML ---#
 def property_listings(request):
     listings = Properties.objects.all().order_by("-id")
-    return render(request, "properties.html", {"properties_list": listings})#---retrieve all records properties table ---#
-# --- Store in listings and send to HTML ---#
-def property_listings(request):
-    listings = Properties.objects.all().order_by("-id")
     favorited_ids = set()
+    favorites_count = 0
+
     if request.user.is_authenticated:
+        # Get IDs of properties, from favorite table, favorited by the current user
+        # purpose is to check/unchecked the favorite icon in each card in properties.html page
         favorited_ids = set(
             Favorite.objects.filter(user=request.user).values_list('property_id', flat=True)
         )
+        # purpose is to show the number of favorited properties in the favorite icon in navbar in properties.html page
+        favorites_count = len(favorited_ids)
+
     return render(request, "properties.html", {
         "properties_list": listings,
         "favorited_ids": favorited_ids,
+        "favorites_count": favorites_count,
+    })
+
+#--used for favorite icon (navbar) to show only favorited properties for current user in properties.html page--#
+@login_required
+def favorites_list(request):
+    # Get IDs of properties, from favorite table, favorited by the current user
+    favorited_ids = set(
+        Favorite.objects.filter(user=request.user).values_list('property_id', flat=True)
+    )
+    #
+    listings = Properties.objects.filter(id__in=favorited_ids).order_by("-id")
+
+    return render(request, "properties.html", {"properties_list": listings,           # parameter related to cards
+                                               "favorited_ids": favorited_ids,        # parameter related to favorite icon in each card (filled or unfilled)
+                                               "favorites_count": len(favorited_ids), # parameter related to favorite icon in navbar (number of favorited properties)
     })
 
 def properties(request):
