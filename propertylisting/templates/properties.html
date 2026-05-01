@@ -70,15 +70,20 @@
                             <span class="meta-item">📐 {{ property.area }} m²</span>
                         </div>
                         <p class="price">MUR {{ property.price }}</p>
-                        <label class="favorite-wrapper">
-                            <input type="checkbox" class="favorite-toggle">
-                            <span class="favorite-icon">♡</span>
-                        </label>
+                        
+                        {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'toggle_favorite' property.id %}" class="favorite-form" onclick="event.stopPropagation()">
+                            {% csrf_token %}
+                            <button type="submit" class="favorite-btn {% if property.id in favorited_ids %}favorited{% endif %}">
+                                {% if property.id in favorited_ids %}♥{% else %}♡{% endif %}
+                            </button>
+                        </form>
+                        {% endif %}
                 </article>
             </a>
         {% endfor %}
     </div>
-    
+
 <!--Footer-->
     <footer class="footer">
         <div class="footer-content">
