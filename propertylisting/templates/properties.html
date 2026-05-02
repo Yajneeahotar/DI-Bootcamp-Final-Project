@@ -52,7 +52,7 @@
 <!-- properties.html -->
     <div class="cards">
         {% for property in properties_list %}
-            <a href="{% url 'property_info' property.id %}" class="card-link">
+            <a href="{% url 'property_info' property.property_ref %}" class="card-link">
                 <article class="card">
                     <div class="img-wrapper">
                         <img src="{{ property.image.url }}" alt="{{ property.title }}">
@@ -76,10 +76,10 @@
                         <p class="price">MUR {{ property.price }}</p>
                         
                         {% if user.is_authenticated %}
-                        <form method="post" action="{% url 'toggle_favorite' property.id %}" class="favorite-form" onclick="event.stopPropagation()">
+                        <form method="post" action="{% url 'toggle_favorite' property.property_ref %}" class="favorite-form" onclick="event.stopPropagation()">
                             {% csrf_token %}
-                            <button type="submit" class="favorite-btn {% if property.id in favorited_ids %}favorited{% endif %}">
-                                {% if property.id in favorited_ids %}♥{% else %}♡{% endif %}
+                            <button type="submit" class="favorite-btn {% if property.property_ref in favorited_ids %}favorited{% endif %}">
+                                {% if property.property_ref in favorited_ids %}♥{% else %}♡{% endif %}
                             </button>
                         </form>
                         {% endif %}

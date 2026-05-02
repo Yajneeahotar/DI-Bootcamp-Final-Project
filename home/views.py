@@ -6,7 +6,7 @@ def homepage(request):
     return render(request, "home/home.html")
 
 def search_filter(request):
-    listings = Properties.objects.all().order_by("-id")
+    listings = Properties.objects.all().order_by("-property_ref")
 
     #request.GET == it is returning a dictionary
     #.get() == retrieving key value pairs. Eg: key = location, value = location value

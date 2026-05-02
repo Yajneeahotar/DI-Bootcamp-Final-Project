@@ -6,6 +6,6 @@ urlpatterns = [
     path('favorites/', views.favorites_list, name='my_favorites'),
     path('add/', views.create_property, name='create_property'),
     path('details/', views.details, name='details'),
-    path('info/<int:id>/', views.property_info, name='property_info'),
-    path('favorite/<int:id>/', views.toggle_favorite, name='toggle_favorite'),
+    path('info/<str:property_ref>/', views.property_info, name='property_info'),
+    path('favorite/<str:property_ref>/', views.toggle_favorite, name='toggle_favorite'),
 ]

@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST
 #---retrieve all records properties table ---#
 # --- Store in listings and send to HTML ---#
 def property_listings(request):
-    listings = Properties.objects.all().order_by("-id")
+    listings = Properties.objects.all().order_by("-property_ref")
     favorited_ids = set()
     favorites_count = 0
 
@@ -18,7 +18,7 @@ def property_listings(request):
         # Get IDs of properties, from favorite table, favorited by the current user
         # purpose is to check/unchecked the favorite icon in each card in properties.html page
         favorited_ids = set(
-            Favorite.objects.filter(user=request.user).values_list('property_id', flat=True)
+            Favorite.objects.filter(user=request.user).values_list('property__property_ref', flat=True)
         )
         # purpose is to show the number of favorited properties in the favorite icon in navbar in properties.html page
         favorites_count = len(favorited_ids)
@@ -34,10 +34,10 @@ def property_listings(request):
 def favorites_list(request):
     # Get IDs of properties, from favorite table, favorited by the current user
     favorited_ids = set(
-        Favorite.objects.filter(user=request.user).values_list('property_id', flat=True)
+        Favorite.objects.filter(user=request.user).values_list('property__property_ref', flat=True)
     )
-    #
-    listings = Properties.objects.filter(id__in=favorited_ids).order_by("-id")
+
+    listings = Properties.objects.filter(property_ref__in=favorited_ids).order_by("-property_ref")
 
     return render(request, "properties.html", {"properties_list": listings,           # parameter related to cards
                                                "favorited_ids": favorited_ids,        # parameter related to favorite icon in each card (filled or unfilled)
@@ -65,14 +65,14 @@ def details(request):
     return render(request, "details.html")
 
 #further propety information while clicking on property cards
-def property_info(request, id):
-    property = get_object_or_404(Properties, id=id)
+def property_info(request, property_ref):
+    property = get_object_or_404(Properties, property_ref=property_ref)
     return render(request, 'propertyinfo.html', {'property': property})
 
 @require_POST
 @login_required
-def toggle_favorite(request, id):
-    property_obj = get_object_or_404(Properties, id=id)
+def toggle_favorite(request, property_ref):
+    property_obj = get_object_or_404(Properties, property_ref=property_ref)
     favorite, created = Favorite.objects.get_or_create(user=request.user, property=property_obj)
     if not created:
         favorite.delete()
