@@ -77,3 +77,9 @@ def toggle_favorite(request, property_ref):
     if not created:
         favorite.delete()
     return redirect('properties')
+
+#this view is for the sell property button in navbar
+def sell_property(request):
+    if request.user.is_authenticated:
+        return redirect('create_property')
+    return render(request, 'sell_landing.html')

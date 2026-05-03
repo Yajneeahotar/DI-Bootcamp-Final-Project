@@ -19,6 +19,8 @@ class Properties(models.Model):
     area = models.PositiveIntegerField(default=0, blank=True)
     image = CloudinaryField('image')
     owner = models.CharField(max_length=200)
+   # type = models.CharField(max_length=200)
+
 
     #use custom save method to generate property_ref in the format YK0001, YK0002, etc. when a new property is created
     def save(self, *args, **kwargs):
