@@ -1,11 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Properties, Favorite
+from .models import Properties, Favorite, PropertyImage
 from .forms import PropertiesForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-'''def property_listings(request):
-    listings = Properties.objects.all().order_by("-id")
-    return render(request, "properties.html", {"properties_list": listings})#---retrieve all records properties table ---#'''
 
 #---retrieve all records properties table ---#
 # --- Store in listings and send to HTML ---#
@@ -54,7 +51,10 @@ def create_property(request):
         if form.is_valid():
             property_record= form.save(commit=False)
             property_record.owner = request.user.username
-            property_record.save()
+            property_record.save() 
+            # retrieve all files uploaded in the additional_images field and create a PropertyImage record for each one, linking it to the newly created property 
+            for img in request.FILES.getlist('additional_images'):
+                PropertyImage.objects.create(property=property_record, image=img)
             return redirect('properties')
     else:
         form = PropertiesForm()

@@ -53,8 +53,9 @@
 
         <div class="gallery">
             <img class="main-img" src="{{ property.image.url }}">
-            <img src="{{ property.image.url }}">
-            <img src="{{ property.image.url }}">
+            {% for extra in property.additional_images.all %}  
+                <img src="{{ extra.image.url }}">
+            {% endfor %}
         </div>
 
         <h1 class="title">{{ property.title }}</h1>

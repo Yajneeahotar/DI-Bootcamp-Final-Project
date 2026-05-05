@@ -47,3 +47,8 @@ class Favorite(models.Model):
                 
     class Meta:
         unique_together = ('user', 'property')
+
+#---Table for additional property images---#
+class PropertyImage(models.Model):
+    property = models.ForeignKey(Properties, on_delete=models.CASCADE, related_name='additional_images')
+    image = CloudinaryField('image')
