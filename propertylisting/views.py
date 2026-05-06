@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 #---retrieve all records properties table ---#
 # --- Store in listings and send to HTML ---#
 def property_listings(request):
-    listings = Properties.objects.all().order_by("-property_ref")
+    listings = Properties.objects.filter(status=Properties.StatusChoices.APPROVED).order_by("-property_ref")
     favorited_ids = set()
     favorites_count = 0
 
