@@ -1,0 +1,182 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard – YK Real Estate</title>
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+
+</head>
+<body>
+<!-- Navbar -->
+<div class="navbar">
+    <div class="nav-left">
+        <a href="#" class="logo">YK Real Estate Management</a>
+        <a href="{% url 'homepage' %}">Home</a>
+        <a href="{% url 'properties' %}">Properties</a>
+        <a href="{% url 'contactus' %}">Contact</a>
+        <a href="#">About</a>
+        <a href="{% url 'sell_property' %}">Sell Your Property</a>
+    </div>
+    <div class="nav-right">
+        {% if user.is_authenticated %}
+            <span class="welcome-text">Welcome, {{ user.username }}</span>
+            {% if perms.propertylisting.change_properties %}
+                <a href="{% url 'admin_dashboard' %}" class="btn-login">Admin Dashboard</a>
+            {% endif %}
+            <a href="{% url 'logout' %}" class="btn-register">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn-login">Login</a>
+            <a href="{% url 'register' %}" class="btn-register">Register</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="dashboard-wrapper">
+    <h1 class="dashboard-title">Admin Dashboard</h1>
+
+    <!-- KPI Row -->
+    <div class="kpi-row">
+        <div class="kpi-card">
+            <div class="kpi-value">{{ total_count }}</div>
+            <div class="kpi-label">Total Properties</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value" style="color:#198754;">{{ approved_count }}</div>
+            <div class="kpi-label">Approved</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value" style="color:#856404;">{{ pending_count }}</div>
+            <div class="kpi-label">Pending Approval</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value" style="color:#dc3545;">{{ rejected_count }}</div>
+            <div class="kpi-label">Rejected</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value">{{ total_users }}</div>
+            <div class="kpi-label">Total Users</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value">{{ total_favorites }}</div>
+            <div class="kpi-label">Total Favourites</div>
+        </div>
+    </div>
+
+    <!-- Pending Approvals -->
+    <div class="section-title">Pending Approvals</div>
+    {% if pending_properties %}
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Ref</th>
+                <th>Title</th>
+                <th>Location</th>
+                <th>Owner</th>
+                <th>Price (MUR)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prop in pending_properties %}
+            <tr>
+                <td>{{ prop.property_ref }}</td>
+                <td><a href="{% url 'property_info' prop.property_ref %}">{{ prop.title }}</a></td>
+                <td>{{ prop.location }}</td>
+                <td>{{ prop.owner }}</td>
+                <td>{{ prop.price }}</td>
+                <td>
+                    <form method="post" action="{% url 'approve_property' prop.property_ref 'approve' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-approve">Approve</button>
+                    </form>
+                    <form method="post" action="{% url 'approve_property' prop.property_ref 'reject' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-reject">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="no-pending">No properties pending approval.</p>
+    {% endif %}
+
+    <!-- All Properties -->
+    <div class="section-title">All Properties</div>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Ref</th>
+                <th>Title</th>
+                <th>Location</th>
+                <th>Owner</th>
+                <th>Price (MUR)</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prop in all_properties %}
+            <tr>
+                <td>{{ prop.property_ref }}</td>
+                <td><a href="{% url 'property_info' prop.property_ref %}">{{ prop.title }}</a></td>
+                <td>{{ prop.location }}</td>
+                <td>{{ prop.owner }}</td>
+                <td>{{ prop.price }}</td>
+                <td>
+                    {% if prop.status == 'Approved' %}
+                        <span class="badge badge-approved">Approved</span>
+                    {% elif prop.status == 'Rejected' %}
+                        <span class="badge badge-rejected">Rejected</span>
+                    {% else %}
+                        <span class="badge badge-pending">Under approval</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if prop.status != 'Approved' %}
+                    <form method="post" action="{% url 'approve_property' prop.property_ref 'approve' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-approve">Approve</button>
+                    </form>
+                    {% endif %}
+                    {% if prop.status != 'Rejected' %}
+                    <form method="post" action="{% url 'approve_property' prop.property_ref 'reject' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-reject">Reject</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p>Email: info@realestate.com</p>
+            <p>Phone: +230 123 4567</p>
+            <p>Location: Mauritius</p>
+        </div>
+        <div class="footer-section">
+            <h3>Follow Us</h3>
+            <div class="socials">
+                <a href="https://facebook.com" target="_blank">
+                    <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook">
+                </a>
+                <a href="https://instagram.com" target="_blank">
+                    <img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" alt="Instagram">
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 Real Estate. All rights reserved.</p>
+    </div>
+</footer>
+</body>
+</html>

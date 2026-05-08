@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Properties, Favorite, PropertyImage
 from .forms import PropertiesForm
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
+from django.contrib.auth.models import User
 
 #---retrieve all records properties table ---#
 # --- Store in listings and send to HTML ---#
@@ -83,3 +84,36 @@ def sell_property(request):
     if request.user.is_authenticated:
         return redirect('create_property')
     return render(request, 'sell_landing.html')
+
+#---admin dashboard view---#
+@permission_required('propertylisting.change_properties', raise_exception=True)
+def admin_dashboard(request):
+    all_properties = Properties.objects.all().order_by('-property_ref')
+    pending_properties = Properties.objects.filter(status=Properties.StatusChoices.UNDER_APPROVAL).order_by('-property_ref')
+    total_count = Properties.objects.count()
+    approved_count = Properties.objects.filter(status=Properties.StatusChoices.APPROVED).count()
+    pending_count = Properties.objects.filter(status=Properties.StatusChoices.UNDER_APPROVAL).count()
+    rejected_count = Properties.objects.filter(status=Properties.StatusChoices.REJECTED).count()
+    total_users = User.objects.count()
+    total_favorites = Favorite.objects.count()
+    return render(request, 'admin_dashboard.html', {
+        'all_properties': all_properties,
+        'pending_properties': pending_properties,
+        'total_count': total_count,
+        'approved_count': approved_count,
+        'pending_count': pending_count,
+        'rejected_count': rejected_count,
+        'total_users': total_users,
+        'total_favorites': total_favorites,
+    })
+
+@require_POST
+@permission_required('propertylisting.change_properties', raise_exception=True)
+def approve_property(request, property_ref, action):
+    property_obj = get_object_or_404(Properties, property_ref=property_ref)
+    if action == 'approve':
+        property_obj.status = Properties.StatusChoices.APPROVED
+    elif action == 'reject':
+        property_obj.status = Properties.StatusChoices.REJECTED
+    property_obj.save()
+    return redirect('property_info', property_ref=property_ref)
