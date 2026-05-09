@@ -116,4 +116,20 @@ def approve_property(request, property_ref, action):
     elif action == 'reject':
         property_obj.status = Properties.StatusChoices.REJECTED
     property_obj.save()
+    
     return redirect('property_info', property_ref=property_ref)
+
+#---owner dashboard: track own property submissions---#
+@login_required
+def my_submissions(request):
+    my_properties = Properties.objects.filter(owner=request.user.username).order_by('-property_ref')
+    approved_count = my_properties.filter(status=Properties.StatusChoices.APPROVED).count()
+    pending_count = my_properties.filter(status=Properties.StatusChoices.UNDER_APPROVAL).count()
+    rejected_count = my_properties.filter(status=Properties.StatusChoices.REJECTED).count()
+
+    return render(request, 'my_submissions.html', {
+        'my_properties': my_properties,
+        'approved_count': approved_count,
+        'pending_count': pending_count,
+        'rejected_count': rejected_count,
+    })

@@ -11,4 +11,5 @@ urlpatterns = [
     path('sell/', views.sell_property, name='sell_property'),
     path('approve/<str:property_ref>/<str:action>/', views.approve_property, name='approve_property'),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('my-submissions/', views.my_submissions, name='my_submissions'),
 ]
