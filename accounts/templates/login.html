@@ -3,6 +3,7 @@
 <html>
 <head>
     <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
 </head>
 <body>
@@ -18,8 +19,25 @@
         </div>
     <!-- Right side -->
         <div class="nav-right">
-            <a href="{% url 'register' %}"class="btn-register">Register</a>
+            <a href="{% url 'register' %}" class="btn-register">Register</a>
+            <!-- Mobile hamburger: always rendered, hidden on desktop via CSS -->
+            <div class="hamburger-mobile" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
+    </div>
+
+    <!-- Mobile dropdown: nav links only -->
+    <div id="mobileMenu" class="mobile-menu">
+        <a href="{% url 'homepage' %}">&#127968; Home</a>
+        <a href="{% url 'properties' %}">&#127968; Properties</a>
+        <a href="{% url 'contactus' %}">&#128222; Contact</a>
+        <a href="#">&#8505;&#65039; About</a>
+        <hr class="nav-divider">
+        <a href="{% url 'login' %}">&#128273; Login</a>
+        <a href="{% url 'register' %}">&#128221; Register</a>
     </div>
 <!--Login Form-->
     <div class="container">
@@ -72,5 +90,18 @@
             <p>&copy; 2026 Real Estate. All rights reserved.</p>
         </div>
     </footer>
+    <script>
+        function toggleMobileMenu() {
+            document.getElementById("mobileMenu").classList.toggle("active");
+        }
+
+        document.addEventListener("click", function(e) {
+            const mm = document.getElementById("mobileMenu");
+            const mBtn = document.querySelector(".hamburger-mobile");
+            if (mm && !mm.contains(e.target) && mBtn && !mBtn.contains(e.target)) {
+                mm.classList.remove("active");
+            }
+        });
+    </script>
 </body>
 </html>

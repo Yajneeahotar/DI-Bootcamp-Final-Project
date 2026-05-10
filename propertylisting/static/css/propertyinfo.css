@@ -113,28 +113,78 @@ body::before {
     font-size: 1.2rem;
 }
 
-.nav-menu {
+/* ── Desktop dropdown menu ─────────────────────────────── */
+.desktop-menu {
     display: none;
     position: absolute;
     top: 70px;
     right: 20px;
-    background: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    background: #2c2c2c;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
     border-radius: 8px;
-    padding: 10px;
+    padding: 8px 0;
     z-index: 999;
+    min-width: 180px;
 }
 
-.nav-menu a {
+.desktop-menu a {
     display: block;
-    padding: 10px;
+    padding: 10px 18px;
     text-decoration: none;
-    color: black;
+    color: #f0f0f0;
+    font-size: 0.9rem;
+    white-space: nowrap;
 }
 
-.nav-menu.active {
+.desktop-menu a:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+.desktop-menu.active {
     display: block;
 }
+
+/* ── Mobile dropdown menu ───────────────────────────────── */
+.mobile-menu {
+    display: none;
+    position: absolute;
+    top: 58px;
+    right: 0;
+    left: 0;
+    width: 100%;
+    background: #2c2c2c;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    z-index: 998;
+    box-sizing: border-box;
+}
+
+.mobile-menu a {
+    width: 100%;
+    padding: 12px 20px;
+    color: #f0f0f0;
+    font-size: 0.95rem;
+    display: block;
+    box-sizing: border-box;
+    text-decoration: none;
+    background: transparent;
+}
+
+.mobile-menu a:hover { background: rgba(255,255,255,0.08); }
+
+.mobile-menu .nav-divider {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    margin: 6px 0;
+    width: 100%;
+    display: block;
+}
+
+.mobile-menu.active { display: flex; }
 
 .btn-login {
     background: #a5a5a5;
@@ -157,19 +207,38 @@ body::before {
     background: #a5a5a5;
 }
 
-/* Hamburger */
-.hamburger {
+/* Desktop hamburger — property actions, only when logged in */
+.hamburger-desktop {
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    margin-left: auto;
+    margin-left: 10px;
+    flex-shrink: 0;
 }
 
-.hamburger span {
+.hamburger-desktop span {
     height: 3px;
     width: 25px;
     background: white;
     margin: 4px 0;
+    border-radius: 2px;
+}
+
+/* Mobile hamburger — always rendered, hidden on desktop */
+.hamburger-mobile {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+.hamburger-mobile span {
+    height: 3px;
+    width: 25px;
+    background: white;
+    margin: 4px 0;
+    border-radius: 2px;
 }
 
 body {
@@ -367,33 +436,6 @@ body {
     }
 }
 
-@media (max-width: 768px) {
-    .hamburger {
-        display: flex;
-    }
-
-    .nav-menu {
-        position: absolute;
-        top: 60px;
-        right: 10px;
-        background: #333;
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 10px;
-        border-radius: 5px;
-        display: none;
-    }
-
-    .nav-menu a,
-    .nav-menu span {
-        width: 100%;
-        padding: 10px;
-    }
-
-    .nav-menu.active {
-        display: flex;
-    }
-}
 /*Footer*/
 .footer {
     background: linear-gradient(135deg, #1a1a1a, #111);
@@ -456,48 +498,39 @@ body {
     border-top: 1px solid #222;
 }
 
-/* Hamburger */
-.hamburger {
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
-     margin-left: auto;
-}
+/* ── RESPONSIVE ── */
+@media (max-width: 1200) {
 
-.hamburger span {
-    height: 3px;
-    width: 25px;
-    background: white;
-    margin: 4px 0;
-}
+    /* Hide desktop hamburger, show mobile hamburger */
+    .hamburger-desktop { display: none !important; }
+    .hamburger-mobile { display: flex; }
 
+    /* Hide desktop dropdown on mobile */
+    .desktop-menu { display: none !important; }
 
-/* Mobile view */
-@media (max-width: 768px) {
+    /* Hide desktop nav links */
+    .nav-left a:not(.logo) { display: none; }
 
-.hamburger {
-    display: flex;
-}
+    /* Hide admin btn on mobile */
+    .btn-admin { display: none !important; }
 
-.nav-menu {
-    position: absolute;
-    top: 60px;
-    right: 10px;
-    background: #333;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 10px;
-    border-radius: 5px;
-    display: none;
-}
+    .navbar { padding: 10px 16px; }
 
-.nav-menu a,
-.nav-menu span {
-    width: 100%;
-    padding: 10px;
-}
+    .container {
+        flex-direction: column;
+        width: 95%;
+    }
 
-.nav-menu.active {
-    display: flex;
-}
+    .gallery {
+        grid-template-columns: 1fr;
+    }
+
+    .main-img {
+        height: 250px;
+    }
+
+    .footer-content {
+        padding: 30px 20px;
+        flex-direction: column;
+    }
 }
