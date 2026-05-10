@@ -380,7 +380,7 @@ body {
 }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 1120px) {
+@media (max-width: 1400px) {
 
     /* Hide desktop hamburger, show mobile hamburger */
     .hamburger-desktop { display: none !important; }

@@ -440,7 +440,7 @@
 }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
 
     /* Hide desktop hamburger, show mobile hamburger */
     .hamburger-desktop { display: none !important; }
@@ -479,9 +479,13 @@
         font-size: 1.5rem;
     }
 
-    .admin-table {
-        display: block;
+  .table-responsive {
+        width: 100%;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-table {
         white-space: nowrap;
     }
 

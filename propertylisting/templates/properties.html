@@ -71,6 +71,9 @@
         <a href="{% url 'sell_property' %}">💰 Sell Your Property</a>
         {% if user.is_authenticated %}
             <hr class="nav-divider">
+            {% if perms.propertylisting.change_properties %}
+                <a href="{% url 'admin_dashboard' %}">&#9881;&#65039; Admin Dashboard</a>
+            {% endif %}
             <a href="{% url 'create_property' %}">➕ Create Property</a>
             <a href="{% url 'my_submissions' %}">📋 My Submissions</a>
             <a href="#">✏️ Edit Property</a>

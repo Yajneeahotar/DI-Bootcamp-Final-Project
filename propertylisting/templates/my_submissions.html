@@ -63,6 +63,9 @@
     <a href="{% url 'sell_property' %}">&#128176; Sell Your Property</a>
     {% if user.is_authenticated %}
         <hr class="nav-divider">
+        {% if perms.propertylisting.change_properties %}
+                <a href="{% url 'admin_dashboard' %}">&#9881;&#65039; Admin Dashboard</a>
+        {% endif %}
         <a href="{% url 'create_property' %}">&#10133; Create Property</a>
         <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
         <a href="#">&#9999;&#65039; Edit Property</a>
@@ -92,36 +95,38 @@
     <!-- Submissions Table -->
     <div class="section-title">All My Properties</div>
     {% if my_properties %}
-    <table class="admin-table">
-        <thead>
-            <tr>
-                <th>Ref</th>
-                <th>Title</th>
-                <th>Location</th>
-                <th>Price (MUR)</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for prop in my_properties %}
-            <tr>
-                <td>{{ prop.property_ref }}</td>
-                <td><a href="{% url 'property_info' prop.property_ref %}">{{ prop.title }}</a></td>
-                <td>{{ prop.location }}</td>
-                <td>{{ prop.price }}</td>
-                <td>
-                    {% if prop.status == 'Approved' %}
-                        <span class="badge badge-approved">&#10003; Approved</span>
-                    {% elif prop.status == 'Rejected' %}
-                        <span class="badge badge-rejected">&#10007; Rejected</span>
-                    {% else %}
-                        <span class="badge badge-pending">&#9679; Under Approval</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Ref</th>
+                    <th>Title</th>
+                    <th>Location</th>
+                    <th>Price (MUR)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prop in my_properties %}
+                <tr>
+                    <td>{{ prop.property_ref }}</td>
+                    <td><a href="{% url 'property_info' prop.property_ref %}">{{ prop.title }}</a></td>
+                    <td>{{ prop.location }}</td>
+                    <td>{{ prop.price }}</td>
+                    <td>
+                        {% if prop.status == 'Approved' %}
+                            <span class="badge badge-approved">&#10003; Approved</span>
+                        {% elif prop.status == 'Rejected' %}
+                            <span class="badge badge-rejected">&#10007; Rejected</span>
+                        {% else %}
+                            <span class="badge badge-pending">&#9679; Under Approval</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
         <p class="no-data">You have not submitted any properties yet.</p>
     {% endif %}
