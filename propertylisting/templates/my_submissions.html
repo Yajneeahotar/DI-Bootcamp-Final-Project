@@ -48,6 +48,7 @@
 {% if user.is_authenticated %}
 <div id="desktopMenu" class="desktop-menu">
     <a href="{% url 'create_property' %}">&#10133; Create Property</a>
+    <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
     <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
     <a href="#">&#9999;&#65039; Edit Property</a>
     <a href="#">&#128465;&#65039; Delete Property</a>
@@ -67,6 +68,7 @@
                 <a href="{% url 'admin_dashboard' %}">&#9881;&#65039; Admin Dashboard</a>
         {% endif %}
         <a href="{% url 'create_property' %}">&#10133; Create Property</a>
+        <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
         <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
         <a href="#">&#9999;&#65039; Edit Property</a>
         <a href="#">&#128465;&#65039; Delete Property</a>
@@ -90,6 +92,10 @@
             <div class="kpi-value" style="color:#dc3545;">{{ rejected_count }}</div>
             <div class="kpi-label">Rejected</div>
         </div>
+        <div class="kpi-card">
+            <div class="kpi-value" style="color:#e85d04;">{{ pending_delete_count }}</div>
+            <div class="kpi-label">Pending Delete</div>
+        </div>
     </div>
 
     <!-- Submissions Table -->
@@ -104,6 +110,7 @@
                     <th>Location</th>
                     <th>Price (MUR)</th>
                     <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -118,8 +125,25 @@
                             <span class="badge badge-approved">&#10003; Approved</span>
                         {% elif prop.status == 'Rejected' %}
                             <span class="badge badge-rejected">&#10007; Rejected</span>
+                        {% elif prop.status == 'Pending delete' %}
+                            <span class="badge badge-pending-delete">&#9201; Pending delete</span>
                         {% else %}
                             <span class="badge badge-pending">&#9679; Under Approval</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if prop.status == 'Pending delete' %}
+                            <form method="post" action="{% url 'cancel_deletion_request' prop.property_ref %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-cancel-delete">Cancel Request</button>
+                            </form>
+                        {% elif prop.status == 'Approved' or prop.status == 'Rejected' %}
+                            <form method="post" action="{% url 'request_deletion' prop.property_ref %}" style="display:inline;" onsubmit="return confirm('Request deletion of \'{{ prop.title }}\'? An admin will review this.')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-delete-request">Request Deletion</button>
+                            </form>
+                        {% else %}
+                            <span class="text-muted">—</span>
                         {% endif %}
                     </td>
                 </tr>

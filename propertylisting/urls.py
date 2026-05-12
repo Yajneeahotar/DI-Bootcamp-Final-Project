@@ -12,4 +12,9 @@ urlpatterns = [
     path('approve/<str:property_ref>/<str:action>/', views.approve_property, name='approve_property'),
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('my-submissions/', views.my_submissions, name='my_submissions'),
+    path('my-properties/', views.my_properties, name='my_properties'),
+    path('request-deletion/<str:property_ref>/', views.request_deletion, name='request_deletion'),
+    path('cancel-deletion/<str:property_ref>/', views.cancel_deletion_request, name='cancel_deletion_request'),
+    path('process-deletion/<str:property_ref>/<str:action>/', views.process_deletion, name='process_deletion'),
+
 ]

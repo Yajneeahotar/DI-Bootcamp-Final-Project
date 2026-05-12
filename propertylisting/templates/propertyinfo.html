@@ -51,9 +51,9 @@
     {% if user.is_authenticated %}
     <div id="desktopMenu" class="desktop-menu">
         <a href="{% url 'create_property' %}">&#10133; Create Property</a>
+        <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
         <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
         <a href="#">&#9999;&#65039; Edit Property</a>
-        <a href="#">&#128465;&#65039; Delete Property</a>
     </div>
     {% endif %}
 
@@ -70,9 +70,9 @@
                 <a href="{% url 'admin_dashboard' %}">&#9881;&#65039; Admin Dashboard</a>
             {% endif %}
             <a href="{% url 'create_property' %}">&#10133; Create Property</a>
+            <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
             <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
             <a href="#">&#9999;&#65039; Edit Property</a>
-            <a href="#">&#128465;&#65039; Delete Property</a>
         {% endif %}
     </div>
 
@@ -100,6 +100,22 @@
         <p class="description">{{ property.description }}</p>
 
         <a href="#">Learn more</a>
+        {% if user.is_authenticated and user.username == property.owner %}
+                <div class="owner-actions">
+                    {% if property.status == 'Approved' or property.status == 'Rejected' %}
+                        <form method="post" action="{% url 'request_deletion' property.property_ref %}" style="display:inline;" onsubmit="return confirm('Request deletion of this property? An admin will review your request.');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-request-delete">&#128465; Request Deletion</button>
+                        </form>
+                    {% elif property.status == 'Pending delete' %}
+                        <span class="badge badge-pending-delete" style="margin-right:12px;">&#128465; Pending Delete</span>
+                        <form method="post" action="{% url 'cancel_deletion_request' property.property_ref %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-cancel-delete">&#10006; Cancel Request</button>
+                        </form>
+                    {% endif %}
+                </div>
+        {% endif %}
 
         <table class="info-table">
             <tr><td>Location</td><td>{{ property.location }}</td></tr>

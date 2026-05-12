@@ -45,9 +45,9 @@
 {% if user.is_authenticated %}
 <div id="desktopMenu" class="desktop-menu">
     <a href="{% url 'create_property' %}">&#10133; Create Property</a>
+    <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
     <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
     <a href="#">&#9999;&#65039; Edit Property</a>
-    <a href="#">&#128465;&#65039; Delete Property</a>
 </div>
 {% endif %}
 
@@ -61,9 +61,9 @@
     {% if user.is_authenticated %}
         <hr class="nav-divider">
         <a href="{% url 'create_property' %}">&#10133; Create Property</a>
+        <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
         <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
         <a href="#">&#9999;&#65039; Edit Property</a>
-        <a href="#">&#128465;&#65039; Delete Property</a>
     {% endif %}
 </div>
 
@@ -96,7 +96,51 @@
             <div class="kpi-value">{{ total_favorites }}</div>
             <div class="kpi-label">Total Favourites</div>
         </div>
+        <div class="kpi-card">
+            <div class="kpi-value" style="color:#e07b00;">{{ pending_delete_count }}</div>
+            <div class="kpi-label">Pending Delete</div>
+        </div>
     </div>
+
+    <!-- Pending Deletions -->
+    <div class="section-title">Pending Deletions</div>
+    {% if pending_delete_properties %}
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Ref</th>
+                <th>Title</th>
+                <th>Location</th>
+                <th>Owner</th>
+                <th>Price (MUR)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prop in pending_delete_properties %}
+            <tr>
+                <td>{{ prop.property_ref }}</td>
+                <td><a href="{% url 'property_info' prop.property_ref %}">{{ prop.title }}</a></td>
+                <td>{{ prop.location }}</td>
+                <td>{{ prop.owner }}</td>
+                <td>{{ prop.price }}</td>
+                <td>
+                    <form method="post" action="{% url 'process_deletion' prop.property_ref 'confirm' %}" style="display:inline;" onsubmit="return confirm('Permanently delete this property? This cannot be undone.');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-confirm-delete">Confirm Delete</button>
+                    </form>
+                    <form method="post" action="{% url 'process_deletion' prop.property_ref 'reject' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-reject">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="no-pending">No deletion requests pending.</p>
+    {% endif %}
 
     <!-- Pending Approvals -->
     <div class="section-title">Pending Approvals</div>
@@ -128,6 +172,10 @@
                     <form method="post" action="{% url 'approve_property' prop.property_ref 'reject' %}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="btn-reject">Reject</button>
+                    </form>
+                    <form method="post" action="{% url 'process_deletion' prop.property_ref 'confirm' %}" style="display:inline;" onsubmit="return confirm('Permanently delete {{ prop.title }}? This cannot be undone.');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-confirm-delete">Delete</button>
                     </form>
                 </td>
             </tr>
@@ -165,9 +213,12 @@
                         <span class="badge badge-approved">Approved</span>
                     {% elif prop.status == 'Rejected' %}
                         <span class="badge badge-rejected">Rejected</span>
+                    {% elif prop.status == 'Pending delete' %}
+                        <span class="badge badge-pending-delete">Pending Delete</span>
                     {% else %}
                         <span class="badge badge-pending">Under approval</span>
                     {% endif %}
+                    
                 </td>
                 <td>
                     {% if prop.status != 'Approved' %}
@@ -182,6 +233,11 @@
                         <button type="submit" class="btn-reject">Reject</button>
                     </form>
                     {% endif %}
+                    <form method="post" action="{% url 'process_deletion' prop.property_ref 'confirm' %}" style="display:inline;" onsubmit="return confirm('Permanently delete {{ prop.title }}? This cannot be undone.');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-confirm-delete">Delete</button>
+                    </form>
+                   
                 </td>
             </tr>
             {% endfor %}

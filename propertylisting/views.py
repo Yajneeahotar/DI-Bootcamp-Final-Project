@@ -90,12 +90,14 @@ def sell_property(request):
 def admin_dashboard(request):
     all_properties = Properties.objects.all().order_by('-property_ref')
     pending_properties = Properties.objects.filter(status=Properties.StatusChoices.UNDER_APPROVAL).order_by('-property_ref')
+    pending_delete_properties = Properties.objects.filter(status=Properties.StatusChoices.PENDING_DELETE).order_by('-property_ref')
     total_count = Properties.objects.count()
     approved_count = Properties.objects.filter(status=Properties.StatusChoices.APPROVED).count()
     pending_count = Properties.objects.filter(status=Properties.StatusChoices.UNDER_APPROVAL).count()
     rejected_count = Properties.objects.filter(status=Properties.StatusChoices.REJECTED).count()
     total_users = User.objects.count()
     total_favorites = Favorite.objects.count()
+    pending_delete_count = pending_delete_properties.count()
     return render(request, 'admin_dashboard.html', {
         'all_properties': all_properties,
         'pending_properties': pending_properties,
@@ -105,6 +107,8 @@ def admin_dashboard(request):
         'rejected_count': rejected_count,
         'total_users': total_users,
         'total_favorites': total_favorites,
+        'pending_delete_properties': pending_delete_properties,
+        'pending_delete_count': pending_delete_count,
     })
 
 @require_POST
@@ -116,8 +120,7 @@ def approve_property(request, property_ref, action):
     elif action == 'reject':
         property_obj.status = Properties.StatusChoices.REJECTED
     property_obj.save()
-    
-    return redirect('property_info', property_ref=property_ref)
+    return redirect('admin_dashboard')
 
 #---owner dashboard: track own property submissions---#
 @login_required
@@ -126,10 +129,68 @@ def my_submissions(request):
     approved_count = my_properties.filter(status=Properties.StatusChoices.APPROVED).count()
     pending_count = my_properties.filter(status=Properties.StatusChoices.UNDER_APPROVAL).count()
     rejected_count = my_properties.filter(status=Properties.StatusChoices.REJECTED).count()
+    pending_delete_count = my_properties.filter(status=Properties.StatusChoices.PENDING_DELETE).count()
 
     return render(request, 'my_submissions.html', {
         'my_properties': my_properties,
         'approved_count': approved_count,
         'pending_count': pending_count,
         'rejected_count': rejected_count,
+        'pending_delete_count': pending_delete_count,
     })
+
+@login_required
+def my_properties(request):
+    favorited_ids = set(
+        Favorite.objects.filter(user=request.user).values_list('property__property_ref', flat=True)
+    )
+    listings = Properties.objects.filter(
+        owner=request.user.username,
+        status=Properties.StatusChoices.APPROVED
+    ).order_by("-property_ref")
+
+    return render(request, "properties.html", {
+        "properties_list": listings,
+        "favorited_ids": favorited_ids,
+        "favorites_count": len(favorited_ids),
+    })
+
+@require_POST
+@login_required
+def request_deletion(request, property_ref):
+    property_obj = get_object_or_404(Properties, property_ref=property_ref)
+    if property_obj.owner != request.user.username:
+        return redirect('my_submissions')
+    allowed_statuses = [Properties.StatusChoices.APPROVED, Properties.StatusChoices.REJECTED, Properties.StatusChoices.UNDER_APPROVAL]
+    if property_obj.status in allowed_statuses:
+        property_obj.previous_status = property_obj.status
+        property_obj.status = Properties.StatusChoices.PENDING_DELETE
+        property_obj.save()
+    return redirect('my_submissions')
+
+#---owner cancels their own pending deletion request---#
+@require_POST
+@login_required
+def cancel_deletion_request(request, property_ref):
+    property_obj = get_object_or_404(Properties, property_ref=property_ref)
+    if property_obj.owner != request.user.username:
+        return redirect('my_submissions')
+    if property_obj.status != Properties.StatusChoices.PENDING_DELETE:
+        return redirect('my_submissions')
+    property_obj.status = property_obj.previous_status
+    property_obj.previous_status = ''
+    property_obj.save()
+    return redirect('my_submissions')
+
+#---admin confirms or rejects a deletion request---#
+@require_POST
+@permission_required('propertylisting.change_properties', raise_exception=True)
+def process_deletion(request, property_ref, action):
+    property_obj = get_object_or_404(Properties, property_ref=property_ref)
+    if action == 'confirm':
+        property_obj.delete()
+    elif action == 'reject':
+        property_obj.status = property_obj.previous_status
+        property_obj.previous_status = ''
+        property_obj.save()
+    return redirect('admin_dashboard')

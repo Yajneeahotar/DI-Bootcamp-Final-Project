@@ -51,6 +51,7 @@
     {% if user.is_authenticated %}
     <div id="desktopMenu" class="desktop-menu">
         <a href="{% url 'create_property' %}">&#10133; Create Property</a>
+        <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
         <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
         <a href="#">&#9999;&#65039; Edit Property</a>
         <a href="#">&#128465;&#65039; Delete Property</a>
@@ -70,6 +71,7 @@
                 <a href="{% url 'admin_dashboard' %}">&#9881;&#65039; Admin Dashboard</a>
             {% endif %}
             <a href="{% url 'create_property' %}">&#10133; Create Property</a>
+            <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
             <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
             <a href="#">&#9999;&#65039; Edit Property</a>
             <a href="#">&#128465;&#65039; Delete Property</a>

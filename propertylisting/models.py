@@ -9,19 +9,21 @@ class Properties(models.Model):
         UNDER_APPROVAL = 'Under approval', 'Under approval'
         APPROVED = 'Approved', 'Approved'
         REJECTED = 'Rejected', 'Rejected'
+        PENDING_DELETE = 'Pending delete', 'Pending delete'
+
 
     property_ref = models.CharField(
         max_length=10,
         primary_key=True,
         editable=False)
         #verbose_name="Property Ref. No."
-    
+
     status = models.CharField(
         max_length=20,
         choices=StatusChoices.choices,
         default=StatusChoices.UNDER_APPROVAL,
     )
-
+    previous_status = models.CharField(max_length=20, blank=True, default='')
     title = models.CharField(max_length=200)
     location = models.CharField(max_length=200)
     price = models.IntegerField()
