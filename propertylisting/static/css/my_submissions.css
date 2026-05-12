@@ -331,16 +331,18 @@
 .badge-pending-delete { background: #ffe5cc; color: #7a3d00; }
 
 /* Action buttons */
-.btn-request-delete {
-background: transparent;
-color: #dc3545;
+.btn-request-delete,
+.btn-delete-request {
+background: #dc3545;
+color: #fff;
 border: 1px solid #dc3545;
 padding: 5px 12px;
 border-radius: 6px;
 cursor: pointer;
 font-size: 0.82rem;
 }
-.btn-request-delete:hover { background: #dc3545; color: #fff; }
+.btn-request-delete:hover,
+.btn-delete-request:hover { background: #a71d2a; border-color: #a71d2a; color: #fff; }
 
 .btn-cancel-delete {
 background: transparent;
