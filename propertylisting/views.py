@@ -68,7 +68,12 @@ def details(request):
 #further propety information while clicking on property cards
 def property_info(request, property_ref):
     property = get_object_or_404(Properties, property_ref=property_ref)
-    return render(request, 'propertyinfo.html', {'property': property})
+    contact_status = request.GET.get('contact')
+    return render(request, 'propertyinfo.html', {
+        'property': property,
+        'contact_success': contact_status == 'success',
+        'contact_error': contact_status == 'error',
+    })
 
 @require_POST
 @login_required

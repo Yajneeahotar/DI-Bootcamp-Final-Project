@@ -133,13 +133,27 @@
                 <p>Get more information about this property</p>
             </div>
             
-            <form>
-                <input type="text" placeholder="Your Name">
-                <input type="email" placeholder="Your Email">
-                <textarea placeholder="Your Message"></textarea>
-                <button class="submit-btn">Send Message</button>
+            {% if contact_success %}
+                <div class="agency-alert agency-alert-success">
+                    Your message has been sent! We will get back to you soon.
+                </div>
+            {% endif %}
+
+            {% if contact_error %}
+                <div class="agency-alert agency-alert-error">
+                    Something went wrong. Please try again or contact us directly.
+                </div>
+            {% endif %}
+
+            <form action="{% url 'property_contact' property.property_ref %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="email" placeholder="Your Email" required>
+                <input type="tel" name="phone" placeholder="Your Phone Number (optional)">
+                <textarea name="message" placeholder="Your Message" required></textarea>
+                <button class="submit-btn" type="submit">Send Message</button>
             </form>
-</div>
+        </div>
 
     </div>
 </div>

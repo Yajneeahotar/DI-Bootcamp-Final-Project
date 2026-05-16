@@ -404,6 +404,27 @@ body {
     resize: none;
 }
 
+/* Agency contact alert banners */
+.agency-alert {
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.agency-alert-success {
+    background-color: #1a3a2a;
+    color: #6fcf97;
+    border-left: 4px solid #27ae60;
+}
+
+.agency-alert-error {
+    background-color: #3a1a1a;
+    color: #eb5757;
+    border-left: 4px solid #e63946;
+}
+
 /* BUTTON */
 .submit-btn {
     background: linear-gradient(135deg, #000, #222);
