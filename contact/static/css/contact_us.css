@@ -411,6 +411,48 @@ body {
     background-color: #c3c7ca;
 }
 
+/* Alert banners */
+.alert {
+    width: 100%;
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+}
+.alert-success {
+    background-color: #1a3a2a;
+    color: #6fcf97;
+    border: none;
+    border-left: 4px solid #27ae60;
+    border-radius: 6px;
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    box-sizing: border-box;
+}
+.alert-error {
+    background-color: #3a1a1a;
+    color: #eb5757;
+    border: none;
+    border-left: 4px solid #e63946;
+    border-radius: 6px;
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    box-sizing: border-box;
+}
+
+/* Inline field errors */
+.field-error {
+    display: block;
+    color: #e63946;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
 /* Desktop hamburger — property actions, only when logged in */
 .hamburger-desktop {
     display: flex;
