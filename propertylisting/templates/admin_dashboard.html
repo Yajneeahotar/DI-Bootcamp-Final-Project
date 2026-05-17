@@ -102,10 +102,33 @@
             <div class="kpi-value" style="color:#0077b6;">{{ pending_edits_count }}</div>
             <div class="kpi-label">Pending Edits</div>
         </div>
+        <div class="kpi-card">
+            <div class="kpi-value" style="color:#6f42c1;">{{ contact_messages_count }}</div>
+            <div class="kpi-label">Contact Messages</div>
+        </div>
     </div>
 
-    <!-- Pending Edits -->
-    <div class="section-title">Pending Edits</div>
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+        <button class="tab-btn" onclick="showTab('tab-pending-edits')" id="btn-tab-pending-edits">
+            Pending Edits <span class="tab-badge">{{ pending_edits_count }}</span>
+        </button>
+        <button class="tab-btn" onclick="showTab('tab-pending-deletions')" id="btn-tab-pending-deletions">
+            Pending Deletions <span class="tab-badge">{{ pending_delete_count }}</span>
+        </button>
+        <button class="tab-btn" onclick="showTab('tab-pending-approvals')" id="btn-tab-pending-approvals">
+            Pending Approvals <span class="tab-badge">{{ pending_count }}</span>
+        </button>
+        <button class="tab-btn" onclick="showTab('tab-all-properties')" id="btn-tab-all-properties">
+            All Properties <span class="tab-badge">{{ total_count }}</span>
+        </button>
+        <button class="tab-btn" onclick="showTab('tab-contact-messages')" id="btn-tab-contact-messages">
+            Contact Messages <span class="tab-badge">{{ contact_messages_count }}</span>
+        </button>
+    </div>
+
+    <!-- Tab: Pending Edits -->
+    <div class="tab-panel" id="tab-pending-edits">
     {% if pending_edits %}
     <table class="admin-table">
         <thead>
@@ -144,8 +167,10 @@
     {% else %}
         <p class="no-pending">No property edits pending review.</p>
     {% endif %}
+    </div>
 
-    <div class="section-title">Pending Deletions</div>
+    <!-- Tab: Pending Deletions -->
+    <div class="tab-panel" id="tab-pending-deletions">
     {% if pending_delete_properties %}
     <table class="admin-table">
         <thead>
@@ -183,9 +208,10 @@
     {% else %}
         <p class="no-pending">No deletion requests pending.</p>
     {% endif %}
+    </div>
 
-    <!-- Pending Approvals -->
-    <div class="section-title">Pending Approvals</div>
+    <!-- Tab: Pending Approvals -->
+    <div class="tab-panel" id="tab-pending-approvals">
     {% if pending_properties %}
     <table class="admin-table">
         <thead>
@@ -227,9 +253,10 @@
     {% else %}
         <p class="no-pending">No properties pending approval.</p>
     {% endif %}
+    </div>
 
-    <!-- All Properties -->
-    <div class="section-title">All Properties</div>
+    <!-- Tab: All Properties -->
+    <div class="tab-panel" id="tab-all-properties">
     <table class="admin-table">
         <thead>
             <tr>
@@ -260,7 +287,6 @@
                     {% else %}
                         <span class="badge badge-pending">Under approval</span>
                     {% endif %}
-                    
                 </td>
                 <td>
                     {% if prop.status != 'Approved' %}
@@ -279,15 +305,52 @@
                         {% csrf_token %}
                         <button type="submit" class="btn-confirm-delete">Delete</button>
                     </form>
-                   
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-</div>
+    </div>
 
-<!-- Footer -->
+    <!-- Tab: Contact Messages -->
+    <div class="tab-panel" id="tab-contact-messages">
+    {% if contact_messages %}
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Property Ref</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for msg in contact_messages %}
+            <tr>
+                <td>{{ msg.submitted_at|date:"Y-m-d H:i" }}</td>
+                <td>{{ msg.name }}</td>
+                <td>{{ msg.email }}</td>
+                <td>{{ msg.phone|default:"-" }}</td>
+                <td>
+                    {% if msg.property %}
+                        <a href="{% url 'property_info' msg.property.property_ref %}">{{ msg.property.property_ref }}</a>
+                    {% else %}
+                        <span style="color:#aaa;">General</span>
+                    {% endif %}
+                </td>
+                <td><span class="msg-preview" title="{{ msg.message }}">{{ msg.message }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="no-pending">No contact messages yet.</p>
+    {% endif %}
+    </div>
+
+</div>
 <footer class="footer">
     <div class="footer-content">
         <div class="footer-section">
@@ -313,6 +376,18 @@
     </div>
 </footer>
 <script>
+    function showTab(id) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).style.display = 'block';
+        document.getElementById('btn-' + id).classList.add('active');
+        sessionStorage.setItem('adminActiveTab', id);
+    }
+
+    // Restore last active tab, or default to first
+    const savedTab = sessionStorage.getItem('adminActiveTab') || 'tab-pending-edits';
+    showTab(savedTab);
+
     function toggleDesktopMenu() {
         const dm = document.getElementById("desktopMenu");
         if (dm) dm.classList.toggle("active");

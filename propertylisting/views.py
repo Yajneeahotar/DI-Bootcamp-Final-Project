@@ -4,6 +4,7 @@ from .forms import PropertiesForm, PropertyEditForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
+from contact.models import ContactMessage
 
 #---retrieve all records properties table ---#
 # --- Store in listings and send to HTML ---#
@@ -105,6 +106,8 @@ def admin_dashboard(request):
     total_favorites = Favorite.objects.count()
     pending_delete_count = pending_delete_properties.count()
     pending_edits_count = pending_edits.count()
+    contact_messages = ContactMessage.objects.select_related('property').all()
+    contact_messages_count = contact_messages.count()
     return render(request, 'admin_dashboard.html', {
         'all_properties': all_properties,
         'pending_properties': pending_properties,
@@ -118,6 +121,8 @@ def admin_dashboard(request):
         'pending_delete_count': pending_delete_count,
         'pending_edits': pending_edits,
         'pending_edits_count': pending_edits_count,
+        'contact_messages': contact_messages,
+        'contact_messages_count': contact_messages_count,
     })
 
 @require_POST
