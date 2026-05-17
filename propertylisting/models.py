@@ -65,3 +65,39 @@ class Favorite(models.Model):
 class PropertyImage(models.Model):
     property = models.ForeignKey(Properties, on_delete=models.CASCADE, related_name='additional_images')
     image = CloudinaryField('image')
+
+#---Staging table for pending property edits---#
+class PropertyEditRequest(models.Model):
+    class EditStatusChoices(models.TextChoices):
+        PENDING  = 'Pending',  'Pending'
+        APPROVED = 'Approved', 'Approved'
+        REJECTED = 'Rejected', 'Rejected'
+
+    property     = models.ForeignKey(Properties, on_delete=models.CASCADE, related_name='edit_requests')
+    status       = models.CharField(max_length=20, choices=EditStatusChoices.choices, default=EditStatusChoices.PENDING)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    # Staged text fields
+    title       = models.CharField(max_length=200)
+    location    = models.CharField(max_length=200)
+    price       = models.IntegerField()
+    description = models.TextField()
+    rooms       = models.PositiveIntegerField(default=0)
+    bedrooms    = models.PositiveIntegerField(default=0)
+    area        = models.PositiveIntegerField(default=0)
+
+    # Optional staged main image – if null, existing image is kept on approval
+    image = CloudinaryField('image', blank=True, null=True)
+
+    # Comma-separated PKs of PropertyImage records to delete on approval
+    image_pks_to_delete = models.TextField(blank=True, default='')
+
+    def delete_count(self):
+        if not self.image_pks_to_delete:
+            return 0
+        return len([pk for pk in self.image_pks_to_delete.split(',') if pk.strip()])
+
+#---Staged images to add as part of a PropertyEditRequest---#
+class StagedImageAdd(models.Model):
+    request = models.ForeignKey(PropertyEditRequest, on_delete=models.CASCADE, related_name='staged_images_to_add')
+    image   = CloudinaryField('image')

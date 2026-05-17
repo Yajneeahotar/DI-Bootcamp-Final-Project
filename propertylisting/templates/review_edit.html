@@ -1,0 +1,219 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Review Edit – YK Real Estate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+    <style>
+        .review-wrapper {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .review-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+        .review-meta {
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+        .review-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 32px;
+            font-size: 0.92rem;
+        }
+        .review-table th {
+            background: #f0f4f8;
+            color: #1a1a2e;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #dce3ec;
+        }
+        .review-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: top;
+        }
+        .review-table tr.changed {
+            background: #fffbe6;
+        }
+        .review-table tr.changed td:first-child {
+            border-left: 4px solid #f0a500;
+        }
+        .tag-changed {
+            display: inline-block;
+            background: #fff3cd;
+            color: #7a5500;
+            font-size: 0.75rem;
+            padding: 1px 7px;
+            border-radius: 10px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .review-image-row {
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
+            margin-bottom: 32px;
+        }
+        .review-image-box {
+            text-align: center;
+        }
+        .review-image-box p {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .review-image-box img {
+            width: 180px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #dce3ec;
+        }
+        .review-image-box img.new-image {
+            border-color: #f0a500;
+        }
+        .staged-images-section {
+            margin-bottom: 32px;
+        }
+        .staged-images-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            padding-left: 10px;
+            border-left: 4px solid #f0a500;
+        }
+        .staged-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .staged-thumb {
+            width: 130px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 2px solid #e63946;
+        }
+        .staged-thumb.add {
+            border-color: #198754;
+        }
+        .review-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<div class="navbar">
+    <div class="nav-left">
+        <a href="#" class="logo">YK Real Estate Management</a>
+        <a href="{% url 'homepage' %}">Home</a>
+        <a href="{% url 'properties' %}">Properties</a>
+        <a href="{% url 'contactus' %}">Contact</a>
+        <a href="{% url 'sell_property' %}">Sell Your Property</a>
+    </div>
+    <div class="nav-right">
+        <a href="{% url 'admin_dashboard' %}">&#8592; Back to Dashboard</a>
+    </div>
+</div>
+
+<div class="review-wrapper">
+    <div class="review-title">Review Edit Request</div>
+    <div class="review-meta">
+        Property: <strong>{{ property.property_ref }} – {{ property.title }}</strong> &nbsp;|&nbsp;
+        Owner: <strong>{{ property.owner }}</strong> &nbsp;|&nbsp;
+        Submitted: <strong>{{ edit_req.submitted_at|date:"d M Y H:i" }}</strong>
+    </div>
+
+    <!-- Main image comparison -->
+    {% if edit_req.image %}
+    <div class="review-image-row">
+        <div class="review-image-box">
+            <p>Current Main Image</p>
+            <img src="{{ property.image.url }}" alt="Current image">
+        </div>
+        <div class="review-image-box">
+            <p>Proposed Main Image <span class="tag-changed">changed</span></p>
+            <img src="{{ edit_req.image.url }}" alt="Proposed image" class="new-image">
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Field comparison table -->
+    <table class="review-table">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Current Value</th>
+                <th>Proposed Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in comparison %}
+            <tr {% if row.changed %}class="changed"{% endif %}>
+                <td>
+                    {{ row.label }}
+                    {% if row.changed %}<span class="tag-changed">changed</span>{% endif %}
+                </td>
+                <td>{{ row.current }}</td>
+                <td>{{ row.proposed }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Staged additional image changes -->
+    {% with images_to_add=edit_req.staged_images_to_add.all %}
+    {% if delete_pk_set or images_to_add %}
+    <div class="staged-images-section">
+        <h3>Additional Image Changes</h3>
+        {% if delete_pk_set %}
+        <p style="font-size:0.88rem;color:#e63946;margin-bottom:8px;">Images marked for deletion (red border):</p>
+        <div class="staged-grid" style="margin-bottom:16px;">
+            {% for img in property.additional_images.all %}
+                {% if img.pk|stringformat:'s' in delete_pk_set %}
+                    <img src="{{ img.image.url }}" class="staged-thumb" title="Will be deleted">
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if images_to_add %}
+        <p style="font-size:0.88rem;color:#198754;margin-bottom:8px;">Images to be added (green border):</p>
+        <div class="staged-grid">
+            {% for staged in images_to_add %}
+                <img src="{{ staged.image.url }}" class="staged-thumb add" title="Will be added">
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Actions -->
+    <div class="review-actions">
+        <form method="post" action="{% url 'approve_edit' edit_req.pk 'approve' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-approve">&#10003; Approve Changes</button>
+        </form>
+        <form method="post" action="{% url 'approve_edit' edit_req.pk 'reject' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-reject">&#10007; Reject Changes</button>
+        </form>
+        <a href="{% url 'admin_dashboard' %}" class="btn-review">Cancel</a>
+    </div>
+</div>
+</body>
+</html>

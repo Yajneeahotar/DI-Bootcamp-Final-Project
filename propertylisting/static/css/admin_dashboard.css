@@ -323,6 +323,8 @@ font-weight: 600;
 .badge-approved { background: #d1e7dd; color: #0f5132; }
 .badge-rejected { background: #f8d7da; color: #842029; }
 .badge-pending-delete { background: #ffe5cc; color: #7a3d00; }
+.badge-edit-pending { background: #cce5ff; color: #004085; }
+.badge-image-edit-pending { background: #f3d9ff; color: #7b2d8b; }
 
 /* Action buttons */
 .btn-approve {
@@ -359,6 +361,20 @@ font-size: 0.85rem;
 margin-right: 6px;
 }
 .btn-confirm-delete:hover { background: #5c0000; }
+
+.btn-review {
+display: inline-block;
+background: transparent;
+color: #0a58ca;
+border: 1px solid #0a58ca;
+padding: 5px 12px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 0.85rem;
+text-decoration: none;
+margin-right: 6px;
+}
+.btn-review:hover { background: #0a58ca; color: #fff; }
 
 
 .no-pending {

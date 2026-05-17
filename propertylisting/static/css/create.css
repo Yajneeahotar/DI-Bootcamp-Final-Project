@@ -254,6 +254,19 @@
     color: black;
 }
 
+.btn-cancel-link {
+    display: inline-block;
+    padding: 12px 24px;
+    border: 1px solid #6c757d;
+    border-radius: 5px;
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn-cancel-link:hover { background-color: #6c757d; color: #fff; }
+
 .create_container p {
     text-align: center;
     margin-top: 15px;

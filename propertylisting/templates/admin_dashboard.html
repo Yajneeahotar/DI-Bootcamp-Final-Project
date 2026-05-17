@@ -46,8 +46,7 @@
 <div id="desktopMenu" class="desktop-menu">
     <a href="{% url 'create_property' %}">&#10133; Create Property</a>
     <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
-    <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
-    <a href="#">&#9999;&#65039; Edit Property</a>
+    <a href="{% url 'my_submissions' %}">&#128203; My Dashboard</a>
 </div>
 {% endif %}
 
@@ -62,8 +61,7 @@
         <hr class="nav-divider">
         <a href="{% url 'create_property' %}">&#10133; Create Property</a>
         <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
-        <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
-        <a href="#">&#9999;&#65039; Edit Property</a>
+        <a href="{% url 'my_submissions' %}">&#128203; My Dashboard</a>
     {% endif %}
 </div>
 
@@ -100,9 +98,53 @@
             <div class="kpi-value" style="color:#e07b00;">{{ pending_delete_count }}</div>
             <div class="kpi-label">Pending Delete</div>
         </div>
+        <div class="kpi-card">
+            <div class="kpi-value" style="color:#0077b6;">{{ pending_edits_count }}</div>
+            <div class="kpi-label">Pending Edits</div>
+        </div>
     </div>
 
-    <!-- Pending Deletions -->
+    <!-- Pending Edits -->
+    <div class="section-title">Pending Edits</div>
+    {% if pending_edits %}
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Ref</th>
+                <th>Title</th>
+                <th>Location</th>
+                <th>Owner</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for edit in pending_edits %}
+            <tr>
+                <td><a href="{% url 'property_info' edit.property.property_ref %}">{{ edit.property.property_ref }}</a></td>
+                <td>{{ edit.title }}</td>
+                <td>{{ edit.location }}</td>
+                <td>{{ edit.property.owner }}</td>
+                <td>{{ edit.price }}</td>
+                <td>
+                    <a href="{% url 'review_edit' edit.pk %}" class="btn-review">&#128269; Review</a>
+                    <form method="post" action="{% url 'approve_edit' edit.pk 'approve' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-approve">Approve</button>
+                    </form>
+                    <form method="post" action="{% url 'approve_edit' edit.pk 'reject' %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-reject">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="no-pending">No property edits pending review.</p>
+    {% endif %}
+
     <div class="section-title">Pending Deletions</div>
     {% if pending_delete_properties %}
     <table class="admin-table">

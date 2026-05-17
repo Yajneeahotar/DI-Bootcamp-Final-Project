@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Properties, Favorite, PropertyImage
-from .forms import PropertiesForm
+from .models import Properties, Favorite, PropertyImage, PropertyEditRequest, StagedImageAdd
+from .forms import PropertiesForm, PropertyEditForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
@@ -96,6 +96,7 @@ def admin_dashboard(request):
     all_properties = Properties.objects.all().order_by('-property_ref')
     pending_properties = Properties.objects.filter(status=Properties.StatusChoices.UNDER_APPROVAL).order_by('-property_ref')
     pending_delete_properties = Properties.objects.filter(status=Properties.StatusChoices.PENDING_DELETE).order_by('-property_ref')
+    pending_edits = PropertyEditRequest.objects.filter(status=PropertyEditRequest.EditStatusChoices.PENDING).select_related('property').order_by('-submitted_at')
     total_count = Properties.objects.count()
     approved_count = Properties.objects.filter(status=Properties.StatusChoices.APPROVED).count()
     pending_count = Properties.objects.filter(status=Properties.StatusChoices.UNDER_APPROVAL).count()
@@ -103,6 +104,7 @@ def admin_dashboard(request):
     total_users = User.objects.count()
     total_favorites = Favorite.objects.count()
     pending_delete_count = pending_delete_properties.count()
+    pending_edits_count = pending_edits.count()
     return render(request, 'admin_dashboard.html', {
         'all_properties': all_properties,
         'pending_properties': pending_properties,
@@ -114,6 +116,8 @@ def admin_dashboard(request):
         'total_favorites': total_favorites,
         'pending_delete_properties': pending_delete_properties,
         'pending_delete_count': pending_delete_count,
+        'pending_edits': pending_edits,
+        'pending_edits_count': pending_edits_count,
     })
 
 @require_POST
@@ -135,6 +139,13 @@ def my_submissions(request):
     pending_count = my_properties.filter(status=Properties.StatusChoices.UNDER_APPROVAL).count()
     rejected_count = my_properties.filter(status=Properties.StatusChoices.REJECTED).count()
     pending_delete_count = my_properties.filter(status=Properties.StatusChoices.PENDING_DELETE).count()
+    pending_edit_refs = set(
+        PropertyEditRequest.objects.filter(
+            property__owner=request.user.username,
+            status=PropertyEditRequest.EditStatusChoices.PENDING
+        ).values_list('property__property_ref', flat=True)
+    )
+    pending_edit_count = len(pending_edit_refs)
 
     return render(request, 'my_submissions.html', {
         'my_properties': my_properties,
@@ -142,6 +153,8 @@ def my_submissions(request):
         'pending_count': pending_count,
         'rejected_count': rejected_count,
         'pending_delete_count': pending_delete_count,
+        'pending_edit_refs': pending_edit_refs,
+        'pending_edit_count': pending_edit_count,
     })
 
 @login_required
@@ -199,3 +212,152 @@ def process_deletion(request, property_ref, action):
         property_obj.previous_status = ''
         property_obj.save()
     return redirect('admin_dashboard')
+
+#---owner submits an edit request (staged, not live until admin approves)---#
+@login_required
+def edit_property(request, property_ref):
+    property_obj = get_object_or_404(Properties, property_ref=property_ref)
+    if property_obj.owner != request.user.username:
+        return redirect('my_submissions')
+
+    editable_statuses = [Properties.StatusChoices.APPROVED, Properties.StatusChoices.REJECTED]
+    if property_obj.status not in editable_statuses:
+        return redirect('my_submissions')
+
+    #when 'submit for review' is clicked
+    if request.method == 'POST':
+        form = PropertyEditForm(request.POST, request.FILES)
+        if form.is_valid():
+            pks_to_delete = request.POST.getlist('delete_image')
+            new_images    = request.FILES.getlist('new_images')
+
+            # Update existing pending edit if one exists, otherwise create
+            edit_req = PropertyEditRequest.objects.filter(
+                property=property_obj,
+                status=PropertyEditRequest.EditStatusChoices.PENDING
+            ).first()
+            if edit_req:
+                edit_req.title       = form.cleaned_data['title']
+                edit_req.location    = form.cleaned_data['location']
+                edit_req.price       = form.cleaned_data['price']
+                edit_req.description = form.cleaned_data['description']
+                edit_req.rooms       = form.cleaned_data['rooms']
+                edit_req.bedrooms    = form.cleaned_data['bedrooms']
+                edit_req.area        = form.cleaned_data['area']
+                if form.cleaned_data.get('image'):
+                    edit_req.image = form.cleaned_data['image']
+                edit_req.image_pks_to_delete = ','.join(pks_to_delete)
+                edit_req.save()
+                edit_req.staged_images_to_add.all().delete()
+            else:
+                edit_req = form.save(commit=False)
+                edit_req.property = property_obj
+                edit_req.image_pks_to_delete = ','.join(pks_to_delete)
+                edit_req.save()
+
+            for img in new_images:
+                StagedImageAdd.objects.create(request=edit_req, image=img)
+
+            return redirect('my_submissions')
+    else:   
+        pending_edit = PropertyEditRequest.objects.filter(
+            property=property_obj,
+            status=PropertyEditRequest.EditStatusChoices.PENDING
+        ).first()
+
+        source = pending_edit if pending_edit else property_obj
+        
+        initial = {
+            'title': source.title,
+            'location': source.location,
+            'price': source.price,
+            'description': source.description,
+            'rooms': source.rooms,
+            'bedrooms': source.bedrooms,
+            'area': source.area,
+        }
+        form = PropertyEditForm(initial=initial)
+
+    current_images = property_obj.additional_images.all()
+    delete_pk_set = set()
+    staged_to_add = []
+    staged_main_image = None
+    if pending_edit:
+        delete_pk_set = set(pk.strip() for pk in pending_edit.image_pks_to_delete.split(',') if pk.strip())
+        staged_to_add = list(pending_edit.staged_images_to_add.all())
+        staged_main_image = pending_edit.image if pending_edit.image else None
+
+    return render(request, 'edit_property.html', {
+        'form': form,
+        'property': property_obj,
+        'staged_main_image': staged_main_image,
+        'current_images': current_images,
+        'delete_pk_set': delete_pk_set,
+        'staged_to_add': staged_to_add,
+    })
+
+#---admin review page: side-by-side comparison of current vs proposed fields---#
+@login_required
+@permission_required('propertylisting.change_properties', raise_exception=True)
+def review_edit(request, edit_id):
+    edit_req = get_object_or_404(PropertyEditRequest, pk=edit_id)
+    prop = edit_req.property
+
+    fields = [
+        ('Title',       prop.title,       edit_req.title),
+        ('Location',    prop.location,    edit_req.location),
+        ('Price (MUR)', prop.price,       edit_req.price),
+        ('Description', prop.description, edit_req.description),
+        ('Rooms',       prop.rooms,       edit_req.rooms),
+        ('Bedrooms',    prop.bedrooms,    edit_req.bedrooms),
+        ('Area (sqft)', prop.area,        edit_req.area),
+    ]
+    comparison = [
+        {'label': label, 'current': str(current), 'proposed': str(proposed), 'changed': str(current) != str(proposed)}
+        for label, current, proposed in fields
+    ]
+
+    return render(request, 'review_edit.html', {
+        'edit_req': edit_req,
+        'property': prop,
+        'comparison': comparison,
+        'delete_pk_set': set(pk.strip() for pk in edit_req.image_pks_to_delete.split(',') if pk.strip()),
+    })
+
+#---admin approves or rejects an edit request---#
+@require_POST
+@permission_required('propertylisting.change_properties', raise_exception=True)
+def approve_edit(request, edit_id, action):
+    edit_req = get_object_or_404(PropertyEditRequest, pk=edit_id)
+    property_obj = edit_req.property
+
+    if action == 'approve':
+        property_obj.title       = edit_req.title
+        property_obj.location    = edit_req.location
+        property_obj.price       = edit_req.price
+        property_obj.description = edit_req.description
+        property_obj.rooms       = edit_req.rooms
+        property_obj.bedrooms    = edit_req.bedrooms
+        property_obj.area        = edit_req.area
+        if edit_req.image:
+            property_obj.image = edit_req.image
+        # Apply any staged additional image changes
+        if edit_req.image_pks_to_delete:
+            pk_list = [int(pk) for pk in edit_req.image_pks_to_delete.split(',') if pk.strip()]
+            PropertyImage.objects.filter(pk__in=pk_list, property=property_obj).delete()
+        for staged in edit_req.staged_images_to_add.all():
+            PropertyImage.objects.create(property=property_obj, image=staged.image)
+        if property_obj.status == Properties.StatusChoices.REJECTED:
+            property_obj.status = Properties.StatusChoices.APPROVED
+        property_obj.save()
+        edit_req.status = PropertyEditRequest.EditStatusChoices.APPROVED
+    elif action == 'reject':
+        edit_req.status = PropertyEditRequest.EditStatusChoices.REJECTED
+
+    edit_req.save()
+    return redirect('admin_dashboard')
+
+#---manage_images redirects to unified edit page---#
+@login_required
+def manage_images(request, property_ref):
+    return redirect('edit_property', property_ref=property_ref)

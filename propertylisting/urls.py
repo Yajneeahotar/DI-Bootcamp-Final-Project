@@ -16,5 +16,8 @@ urlpatterns = [
     path('request-deletion/<str:property_ref>/', views.request_deletion, name='request_deletion'),
     path('cancel-deletion/<str:property_ref>/', views.cancel_deletion_request, name='cancel_deletion_request'),
     path('process-deletion/<str:property_ref>/<str:action>/', views.process_deletion, name='process_deletion'),
-
+    path('edit/<str:property_ref>/', views.edit_property, name='edit_property'),
+    path('approve-edit/<int:edit_id>/<str:action>/', views.approve_edit, name='approve_edit'),
+    path('review-edit/<int:edit_id>/', views.review_edit, name='review_edit'),
+    path('manage-images/<str:property_ref>/', views.manage_images, name='manage_images'),
 ]

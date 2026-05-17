@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Submissions – YK Real Estate</title>
+    <title>My Dashboard – YK Real Estate</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/my_submissions.css' %}">
 
@@ -49,9 +49,7 @@
 <div id="desktopMenu" class="desktop-menu">
     <a href="{% url 'create_property' %}">&#10133; Create Property</a>
     <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
-    <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
-    <a href="#">&#9999;&#65039; Edit Property</a>
-    <a href="#">&#128465;&#65039; Delete Property</a>
+    <a href="{% url 'my_submissions' %}">&#128203; My Dashboard</a>
 </div>
 {% endif %}
 
@@ -69,9 +67,7 @@
         {% endif %}
         <a href="{% url 'create_property' %}">&#10133; Create Property</a>
         <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
-        <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
-        <a href="#">&#9999;&#65039; Edit Property</a>
-        <a href="#">&#128465;&#65039; Delete Property</a>
+        <a href="{% url 'my_submissions' %}">&#128203; My Dashboard</a>
     {% endif %}
 </div>
 
@@ -96,6 +92,10 @@
             <div class="kpi-value" style="color:#e85d04;">{{ pending_delete_count }}</div>
             <div class="kpi-label">Pending Delete</div>
         </div>
+        <div class="kpi-card">
+            <div class="kpi-value" style="color:#0077b6;">{{ pending_edit_count }}</div>
+            <div class="kpi-label">Pending Edit</div>
+        </div>
     </div>
 
     <!-- Submissions Table -->
@@ -116,7 +116,11 @@
             <tbody>
                 {% for prop in my_properties %}
                 <tr>
-                    <td>{{ prop.property_ref }}</td>
+                    <td>{{ prop.property_ref }}
+                        {% if prop.property_ref in pending_edit_refs %}
+                            <span class="badge badge-edit-pending">&#9999; Edit Pending</span>
+                        {% endif %}
+                    </td>
                     <td><a href="{% url 'property_info' prop.property_ref %}">{{ prop.title }}</a></td>
                     <td>{{ prop.location }}</td>
                     <td>{{ prop.price }}</td>
@@ -137,13 +141,14 @@
                                 {% csrf_token %}
                                 <button type="submit" class="btn-cancel-delete">Cancel Request</button>
                             </form>
-                        {% elif prop.status == 'Approved' or prop.status == 'Rejected' %}
-                            <form method="post" action="{% url 'request_deletion' prop.property_ref %}" style="display:inline;" onsubmit="return confirm('Request deletion of \'{{ prop.title }}\'? An admin will review this.')">
+                        {% else %}
+                            {% if prop.status == 'Approved' or prop.status == 'Rejected' %}
+                                <a href="{% url 'edit_property' prop.property_ref %}" class="btn-edit">&#9999; Edit</a>
+                            {% endif %}
+                            <form method="post" action="{% url 'request_deletion' prop.property_ref %}" style="display:inline;" onsubmit="return confirm('Request deletion of &apos;{{ prop.title }}&apos;? An admin will review this.')">
                                 {% csrf_token %}
                                 <button type="submit" class="btn-delete-request">Request Deletion</button>
                             </form>
-                        {% else %}
-                            <span class="text-muted">—</span>
                         {% endif %}
                     </td>
                 </tr>

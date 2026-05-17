@@ -329,6 +329,8 @@
 .badge-approved { background: #d1e7dd; color: #0f5132; }
 .badge-rejected { background: #f8d7da; color: #842029; }
 .badge-pending-delete { background: #ffe5cc; color: #7a3d00; }
+.badge-edit-pending { background: #cce5ff; color: #004085; }
+.badge-image-edit-pending { background: #f3d9ff; color: #7b2d8b; }
 
 /* Action buttons */
 .btn-request-delete,
@@ -354,6 +356,34 @@ cursor: pointer;
 font-size: 0.82rem;
 }
 .btn-cancel-delete:hover { background: #6c757d; color: #fff; }
+
+.btn-edit {
+display: inline-block;
+background: transparent;
+color: #0077b6;
+border: 1px solid #0077b6;
+padding: 5px 12px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 0.82rem;
+text-decoration: none;
+margin-right: 4px;
+}
+.btn-edit:hover { background: #0077b6; color: #fff; }
+
+.btn-manage-images {
+display: inline-block;
+background: transparent;
+color: #0a7c6c;
+border: 1px solid #0a7c6c;
+padding: 5px 12px;
+border-radius: 6px;
+cursor: pointer;
+font-size: 0.82rem;
+text-decoration: none;
+margin-right: 4px;
+}
+.btn-manage-images:hover { background: #0a7c6c; color: #fff; }
 
 /* ── Empty state ── */
 .no-data {

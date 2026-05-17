@@ -3,10 +3,9 @@
 
 <html>
 <head>
-    <title>Create Property</title>
+    <title>Edit Property – YK Real Estate</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/create.css' %}">
-    
 </head>
 <body>
     <!-- Navbar -->
@@ -27,13 +26,11 @@
                 <a href="{% url 'admin_dashboard' %}" class="btn-login btn-admin">Admin Dashboard</a>
             {% endif %}
             <a href="{% url 'logout' %}" class="btn-register">Logout</a>
-            <!-- Desktop hamburger: property actions -->
             <div class="hamburger-desktop" onclick="toggleDesktopMenu()">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
-            <!-- Mobile hamburger: always rendered, hidden on desktop via CSS -->
             <div class="hamburger-mobile" onclick="toggleMobileMenu()">
                 <span></span>
                 <span></span>
@@ -42,16 +39,15 @@
         </div>
     </div>
 
-    <!-- Desktop dropdown: property actions -->
+    <!-- Desktop dropdown -->
     <div id="desktopMenu" class="desktop-menu">
         <a href="{% url 'create_property' %}">&#10133; Create Property</a>
-        <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
         <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
         <a href="{% url 'my_submissions' %}">&#9999;&#65039; Edit Property</a>
         <a href="{% url 'my_submissions' %}">&#128465;&#65039; Delete Property</a>
     </div>
 
-    <!-- Mobile dropdown: nav links + property actions -->
+    <!-- Mobile dropdown -->
     <div id="mobileMenu" class="mobile-menu">
         <a href="{% url 'homepage' %}">&#127968; Home</a>
         <a href="{% url 'properties' %}">&#127968; Properties</a>
@@ -60,39 +56,99 @@
         <a href="{% url 'sell_property' %}">&#128176; Sell Your Property</a>
         <hr class="nav-divider">
         {% if perms.propertylisting.change_properties %}
-                <a href="{% url 'admin_dashboard' %}">&#9881;&#65039; Admin Dashboard</a>
+            <a href="{% url 'admin_dashboard' %}">&#9881;&#65039; Admin Dashboard</a>
         {% endif %}
         <a href="{% url 'create_property' %}">&#10133; Create Property</a>
-        <a href="{% url 'my_properties' %}">&#127968; My Properties</a>
         <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
         <a href="{% url 'my_submissions' %}">&#9999;&#65039; Edit Property</a>
         <a href="{% url 'my_submissions' %}">&#128465;&#65039; Delete Property</a>
     </div>
+
     <div class="create_container">
-        <h2>Add Property</h2>
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
+        <h2>Edit Property – {{ property.property_ref }}</h2>
+        <p style="color:#aaa; font-size:0.9rem; margin-bottom:16px;">
+            Your changes will be submitted for admin review before going live.
+        </p>
 
-                {{ form.as_p }}
+        <!-- Current image preview -->
+        {% if property.image %}
+        <div style="margin-bottom:16px;">
+            <p style="color:#ccc; font-size:0.85rem; margin-bottom:6px;">Current main image:</p>
+            <img src="{{ property.image.url }}" alt="Current image" style="max-height:160px; border-radius:8px; border:1px solid #444;">
+        </div>
+        {% endif %}
 
-                <p>
-                    <label for="additional_images">Additional Images</label><br>
-                    <input type="file" id="additional_images" name="additional_images" multiple>
-                </p>
-                <button type="submit">Save</button>
-            </form>
+        {% if staged_main_image %}
+        <div style="margin-bottom:16px;">
+            <p style="color:#c9a84c; font-size:0.85rem; margin-bottom:6px;">&#9888; Staged main image (pending review — will replace current on approval):</p>
+            <img src="{{ staged_main_image.url }}" alt="Staged image" style="max-height:160px; border-radius:8px; border:2px solid #c9a84c;">
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <p style="color:#aaa; font-size:0.82rem; margin-top:-6px; margin-bottom:12px;">
+                Leave the image field blank to keep the current main image.
+            </p>
+
+            <!-- Additional images -->
+            <div style="margin-top:20px;">
+                <p style="color:#ccc; font-weight:600; font-size:0.95rem; border-left:3px solid #c9a84c; padding-left:10px; margin-bottom:10px;">Additional Images</p>
+                {% if current_images %}
+                <p style="color:#aaa; font-size:0.83rem; margin-bottom:10px;">Check images you want to remove.</p>
+                <div style="display:flex; flex-wrap:wrap; gap:14px; margin-bottom:18px;">
+                    {% for img in current_images %}
+                    <div id="card-{{ img.pk }}" style="border:2px solid {% if img.pk|stringformat:'s' in delete_pk_set %}#e63946{% else %}#444{% endif %}; border-radius:8px; overflow:hidden; width:150px; background:#1e1e1e;">
+                        <img src="{{ img.image.url }}" style="width:150px; height:110px; object-fit:cover; display:block;">
+                        <label style="display:flex; align-items:center; gap:6px; padding:7px; font-size:0.82rem; color:#e63946; cursor:pointer;">
+                            <input type="checkbox" name="delete_image" value="{{ img.pk }}"
+                                {% if img.pk|stringformat:'s' in delete_pk_set %}checked{% endif %}
+                                onchange="toggleDeleteMark(this, 'card-{{ img.pk }}')"
+                                style="width:15px; height:15px; accent-color:#e63946;">
+                            Mark for removal
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p style="color:#777; font-style:italic; margin-bottom:16px;">No additional images currently.</p>
+                {% endif %}
+
+                {% if staged_to_add %}
+                <p style="color:#c9a84c; font-size:0.83rem; margin-bottom:8px;">&#9888; {{ staged_to_add|length }} image(s) already staged to add (pending review). Uploading new files will replace them.</p>
+                <div style="display:flex; flex-wrap:wrap; gap:14px; margin-bottom:16px;">
+                    {% for staged in staged_to_add %}
+                    <div style="border:2px solid #198754; border-radius:8px; overflow:hidden; width:150px; background:#1e1e1e;">
+                        <img src="{{ staged.image.url }}" style="width:150px; height:110px; object-fit:cover; display:block;">
+                        <label style="display:flex; align-items:center; gap:6px; padding:7px; font-size:0.82rem; color:#198754;">&#10003; Staged to add</label>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <p style="color:#aaa; font-size:0.83rem; margin-bottom:6px;">Add new images:</p>
+                <input type="file" name="new_images" multiple accept="image/*" style="color:#ccc;">
+            </div>
+
+            <div style="display:flex; gap:12px; margin-top:16px;">
+                <button type="submit">Submit for Review</button>
+                <a href="{% url 'my_submissions' %}" class="btn-cancel-link">Cancel</a>
+            </div>
+        </form>
     </div>
+
     <!--Footer-->
     <footer class="footer">
         <div class="footer-content">
-            
             <div class="footer-section">
                 <h3>Contact Us</h3>
                 <p>Email: info@realestate.com</p>
                 <p>Phone: +230 123 4567</p>
                 <p>Location: Mauritius</p>
             </div>
-
             <div class="footer-section">
                 <h3>Follow Us</h3>
                 <div class="socials">
@@ -110,6 +166,10 @@
         </div>
     </footer>
     <script>
+        function toggleDeleteMark(checkbox, cardId) {
+            const card = document.getElementById(cardId);
+            if (card) card.style.borderColor = checkbox.checked ? '#e63946' : '#444';
+        }
         function toggleDesktopMenu() {
             const dm = document.getElementById("desktopMenu");
             if (dm) dm.classList.toggle("active");

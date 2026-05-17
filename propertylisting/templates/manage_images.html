@@ -1,0 +1,242 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Images – {{ property.property_ref }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/create.css' %}">
+    <style>
+        .images-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .image-card {
+            position: relative;
+            border: 1px solid #444;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 160px;
+            background: #1e1e1e;
+        }
+        .image-card img {
+            width: 160px;
+            height: 120px;
+            object-fit: cover;
+            display: block;
+        }
+        .image-card label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            font-size: 0.82rem;
+            color: #e63946;
+            cursor: pointer;
+        }
+        .image-card input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #e63946;
+            cursor: pointer;
+        }
+        .image-card.marked {
+            border-color: #e63946;
+        }
+        .no-images-msg {
+            color: #777;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        .section-label {
+            color: #ccc;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            border-left: 3px solid #c9a84c;
+            padding-left: 10px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            align-items: center;
+        }
+        .notice {
+            color: #aaa;
+            font-size: 0.83rem;
+            margin-top: 4px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="nav-left">
+            <a href="#" class="logo">YK Real Estate Management</a>
+            <a href="{% url 'homepage' %}">Home</a>
+            <a href="{% url 'properties' %}">Properties</a>
+            <a href="{% url 'contactus' %}">Contact</a>
+            <a href="#">About</a>
+            <a href="{% url 'sell_property' %}">Sell Your Property</a>
+        </div>
+        <div class="nav-right">
+            <span class="welcome-text">Welcome, {{ user.username }}</span>
+            {% if perms.propertylisting.change_properties %}
+                <a href="{% url 'admin_dashboard' %}" class="btn-login btn-admin">Admin Dashboard</a>
+            {% endif %}
+            <a href="{% url 'logout' %}" class="btn-register">Logout</a>
+            <div class="hamburger-desktop" onclick="toggleDesktopMenu()">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="hamburger-mobile" onclick="toggleMobileMenu()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Desktop dropdown -->
+    <div id="desktopMenu" class="desktop-menu">
+        <a href="{% url 'create_property' %}">&#10133; Create Property</a>
+        <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
+        <a href="{% url 'my_submissions' %}">&#9999;&#65039; Edit Property</a>
+        <a href="{% url 'my_submissions' %}">&#128465;&#65039; Delete Property</a>
+    </div>
+
+    <!-- Mobile dropdown -->
+    <div id="mobileMenu" class="mobile-menu">
+        <a href="{% url 'homepage' %}">&#127968; Home</a>
+        <a href="{% url 'properties' %}">&#127968; Properties</a>
+        <a href="{% url 'contactus' %}">&#128222; Contact</a>
+        <a href="#">&#8505;&#65039; About</a>
+        <a href="{% url 'sell_property' %}">&#128176; Sell Your Property</a>
+        <hr class="nav-divider">
+        {% if perms.propertylisting.change_properties %}
+            <a href="{% url 'admin_dashboard' %}">&#9881;&#65039; Admin Dashboard</a>
+        {% endif %}
+        <a href="{% url 'create_property' %}">&#10133; Create Property</a>
+        <a href="{% url 'my_submissions' %}">&#128203; My Submissions</a>
+        <a href="{% url 'my_submissions' %}">&#9999;&#65039; Edit Property</a>
+        <a href="{% url 'my_submissions' %}">&#128465;&#65039; Delete Property</a>
+    </div>
+
+    <div class="create_container">
+        <h2>Manage Images – {{ property.property_ref }}</h2>
+        <p class="notice">
+            Your changes will be submitted for admin review before taking effect.
+        </p>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Current additional images -->
+            <div class="section-label">Current Additional Images</div>
+            {% if current_images %}
+                <p class="notice">Check the images you want to delete.</p>
+                <div class="images-grid" id="imagesGrid">
+                    {% for img in current_images %}
+                    <div class="image-card {% if img.pk|stringformat:'s' in delete_pk_set %}marked{% endif %}" id="card-{{ img.pk }}">
+                        <img src="{{ img.image.url }}" alt="Image {{ img.pk }}">
+                        <label>
+                            <input type="checkbox" name="delete_image" value="{{ img.pk }}"
+                                   {% if img.pk|stringformat:'s' in delete_pk_set %}checked{% endif %}
+                                   onchange="toggleMark(this, 'card-{{ img.pk }}')">
+                            Mark for deletion
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="no-images-msg">No additional images currently.</p>
+            {% endif %}
+
+            <!-- Add new images -->
+            <div class="section-label" style="margin-top: 20px;">Add New Images</div>
+            {% if staged_to_add %}
+            <p class="notice" style="color:#c9a84c;">&#9888; You have {{ staged_to_add|length }} image(s) already staged to add (pending admin review). Uploading new files below will replace them.</p>
+            <div class="images-grid" style="margin-bottom:12px;">
+                {% for staged in staged_to_add %}
+                <div class="image-card" style="border-color:#198754;">
+                    <img src="{{ staged.image.url }}" alt="Staged image">
+                    <label style="color:#198754;">&#10003; Staged to add</label>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <p class="notice">Select one or more images to add.</p>
+            <input type="file" name="new_images" multiple accept="image/*">
+
+            <div class="form-actions">
+                <button type="submit">Submit for Review</button>
+                <a href="{% url 'my_submissions' %}" class="btn-cancel-link">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@realestate.com</p>
+                <p>Phone: +230 123 4567</p>
+                <p>Location: Mauritius</p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="socials">
+                    <a href="https://facebook.com" target="_blank">
+                        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook">
+                    </a>
+                    <a href="https://instagram.com" target="_blank">
+                        <img src="https://cdn-icons-png.flaticon.com/512/733/733558.png" alt="Instagram">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Real Estate. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMark(checkbox, cardId) {
+            const card = document.getElementById(cardId);
+            if (checkbox.checked) {
+                card.classList.add('marked');
+            } else {
+                card.classList.remove('marked');
+            }
+        }
+
+        function toggleDesktopMenu() {
+            const dm = document.getElementById("desktopMenu");
+            if (dm) dm.classList.toggle("active");
+            const mm = document.getElementById("mobileMenu");
+            if (mm) mm.classList.remove("active");
+        }
+
+        function toggleMobileMenu() {
+            const mm = document.getElementById("mobileMenu");
+            mm.classList.toggle("active");
+            const dm = document.getElementById("desktopMenu");
+            if (dm) dm.classList.remove("active");
+        }
+
+        document.addEventListener("click", function(e) {
+            const dm = document.getElementById("desktopMenu");
+            const mm = document.getElementById("mobileMenu");
+            const dBtn = document.querySelector(".hamburger-desktop");
+            const mBtn = document.querySelector(".hamburger-mobile");
+            if (dm && !dm.contains(e.target) && dBtn && !dBtn.contains(e.target)) {
+                dm.classList.remove("active");
+            }
+            if (mm && !mm.contains(e.target) && mBtn && !mBtn.contains(e.target)) {
+                mm.classList.remove("active");
+            }
+        });
+    </script>
+</body>
+</html>
