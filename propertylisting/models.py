@@ -101,3 +101,17 @@ class PropertyEditRequest(models.Model):
 class StagedImageAdd(models.Model):
     request = models.ForeignKey(PropertyEditRequest, on_delete=models.CASCADE, related_name='staged_images_to_add')
     image   = CloudinaryField('image')
+
+#---In-app notifications for logged-in users---#
+class Notification(models.Model):
+    user        = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    message     = models.TextField()
+    is_read     = models.BooleanField(default=False)
+    created_at  = models.DateTimeField(auto_now_add=True)
+    related_ref = models.CharField(max_length=10, blank=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Notification for {self.user.username}: {self.message[:50]}"

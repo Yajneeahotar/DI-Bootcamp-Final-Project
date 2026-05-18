@@ -20,4 +20,6 @@ urlpatterns = [
     path('approve-edit/<int:edit_id>/<str:action>/', views.approve_edit, name='approve_edit'),
     path('review-edit/<int:edit_id>/', views.review_edit, name='review_edit'),
     path('manage-images/<str:property_ref>/', views.manage_images, name='manage_images'),
+    path('notifications/mark-read/<int:notification_id>/', views.mark_notification_read, name='mark_notification_read'),
+    path('notifications/mark-all-read/', views.mark_all_notifications_read, name='mark_all_notifications_read'),
 ]

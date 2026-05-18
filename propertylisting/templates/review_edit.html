@@ -5,6 +5,7 @@
     <title>Review Edit – YK Real Estate</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
     <style>
         .review-wrapper {
             max-width: 900px;
@@ -126,6 +127,34 @@
         <a href="{% url 'sell_property' %}">Sell Your Property</a>
     </div>
     <div class="nav-right">
+        {% if user.is_authenticated %}
+        <!-- Notification Bell -->
+        <div class="notif-bell-wrapper">
+            <button class="notif-bell-btn" onclick="toggleNotifDropdown(event)" aria-label="Notifications">
+                🔔
+                {% if unread_notifications_count %}<span class="notif-badge">{{ unread_notifications_count }}</span>{% endif %}
+            </button>
+            <div class="notif-dropdown" id="notifDropdown">
+                <div class="notif-header">
+                    <span>Notifications</span>
+                    {% if unread_notifications_count %}
+                    <form method="post" action="{% url 'mark_all_notifications_read' %}">{% csrf_token %}<button type="submit" class="notif-mark-all">Mark all as read</button></form>
+                    {% endif %}
+                </div>
+                <div class="notif-list">
+                    {% for notif in user_notifications %}
+                    <div class="notif-item notif-unread">
+                        <p class="notif-msg">{{ notif.message }}</p>
+                        <span class="notif-time">{{ notif.created_at|timesince }} ago</span>
+                        <form method="post" action="{% url 'mark_notification_read' notif.id %}">{% csrf_token %}<button type="submit" class="notif-mark-read">✓ Mark as read</button></form>
+                    </div>
+                    {% empty %}
+                    <div class="notif-empty">No new notifications</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
         <a href="{% url 'admin_dashboard' %}">&#8592; Back to Dashboard</a>
     </div>
 </div>
@@ -215,5 +244,6 @@
         <a href="{% url 'admin_dashboard' %}" class="btn-review">Cancel</a>
     </div>
 </div>
+<script src="{% static 'js/notifications.js' %}"></script>
 </body>
 </html>

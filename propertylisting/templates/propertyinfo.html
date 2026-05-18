@@ -6,6 +6,7 @@
     <title>Real Estate</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/propertyinfo.css' %}">
+    <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
 </head>
 <body>
     <!-- Navbar -->
@@ -22,6 +23,32 @@
     <!-- Right side -->
         <div class="nav-right">
             {% if user.is_authenticated %}
+                <!-- Notification Bell -->
+                <div class="notif-bell-wrapper">
+                    <button class="notif-bell-btn" onclick="toggleNotifDropdown(event)" aria-label="Notifications">
+                        🔔
+                        {% if unread_notifications_count %}<span class="notif-badge">{{ unread_notifications_count }}</span>{% endif %}
+                    </button>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-header">
+                            <span>Notifications</span>
+                            {% if unread_notifications_count %}
+                            <form method="post" action="{% url 'mark_all_notifications_read' %}">{% csrf_token %}<button type="submit" class="notif-mark-all">Mark all as read</button></form>
+                            {% endif %}
+                        </div>
+                        <div class="notif-list">
+                            {% for notif in user_notifications %}
+                            <div class="notif-item notif-unread">
+                                <p class="notif-msg">{{ notif.message }}</p>
+                                <span class="notif-time">{{ notif.created_at|timesince }} ago</span>
+                                <form method="post" action="{% url 'mark_notification_read' notif.id %}">{% csrf_token %}<button type="submit" class="notif-mark-read">✓ Mark as read</button></form>
+                            </div>
+                            {% empty %}
+                            <div class="notif-empty">No new notifications</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
                 <span class="welcome-text">Welcome, {{ user.username }}</span>
                 {% if perms.propertylisting.change_properties %}
                     <a href="{% url 'admin_dashboard' %}" class="btn-login btn-admin">Admin Dashboard</a>
@@ -80,11 +107,31 @@
     <!-- LEFT SIDE -->
     <div class="left">
 
-        <div class="gallery">
-            <img class="main-img" src="{{ property.image.url }}">
-            {% for extra in property.additional_images.all %}  
-                <img src="{{ extra.image.url }}">
-            {% endfor %}
+        <div class="gallery-wrapper">
+            <div class="gallery">
+
+                <img class="main-img" src="{{ property.image.url }}" data-index="0">
+
+                    {% for extra in property.additional_images.all|slice:":4" %}
+                        <img src="{{ extra.image.url }}" data-index="{{ forloop.counter }}">
+                    {% endfor %}
+
+            </div>
+            {% if property.additional_images.all.count > 4 %}
+            <button class="view-all-btn" onclick="openSlideshow(0)">&#128444; View All Images</button>
+            {% endif %}
+        </div>
+
+        <!-- Slideshow Modal -->
+        <div id="slideshowModal" class="slideshow-modal">
+            <div class="slideshow-overlay" onclick="closeSlideshow()"></div>
+            <div class="slideshow-content">
+                <button class="slideshow-close" onclick="closeSlideshow()">&#10005;</button>
+                <button class="slideshow-prev" onclick="changeSlide(-1)">&#8592;</button>
+                <img id="slideshowImg" src="" alt="Property image">
+                <button class="slideshow-next" onclick="changeSlide(1)">&#8594;</button>
+                <div class="slideshow-counter" id="slideshowCounter"></div>
+            </div>
         </div>
 
         <h1 class="title">{{ property.title }}</h1>
@@ -183,7 +230,60 @@
             <p>&copy; 2026 Real Estate. All rights reserved.</p>
         </div>
     </footer>
+    <script id="imageData" type="application/json">
+    [
+        "{{ property.image.url }}"
+        {% for extra in property.additional_images.all %}
+        ,"{{ extra.image.url }}"
+        {% endfor %}
+    ]
+    </script>
     <script>
+        // All property images for the slideshow
+        const allImages = JSON.parse(document.getElementById("imageData").textContent);
+
+        let currentSlide = 0;
+
+        function openSlideshow(index) {
+            currentSlide = index;
+            updateSlide();
+            document.getElementById("slideshowModal").classList.add("active");
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeSlideshow() {
+            document.getElementById("slideshowModal").classList.remove("active");
+            document.body.style.overflow = "";
+        }
+
+        function changeSlide(dir) {
+            currentSlide = (currentSlide + dir + allImages.length) % allImages.length;
+            updateSlide();
+        }
+
+        function updateSlide() {
+            document.getElementById("slideshowImg").src = allImages[currentSlide];
+            document.getElementById("slideshowCounter").textContent = (currentSlide + 1) + " / " + allImages.length;
+        }
+
+        document.addEventListener("keydown", function(e) {
+            const modal = document.getElementById("slideshowModal");
+            if (!modal.classList.contains("active")) return;
+            if (e.key === "ArrowLeft")  changeSlide(-1);
+            if (e.key === "ArrowRight") changeSlide(1);
+            if (e.key === "Escape")     closeSlideshow();
+        });
+
+
+        document.querySelectorAll(".gallery img").forEach(img => {
+            img.addEventListener("click", function () {
+                openSlideshow(parseInt(this.dataset.index));
+            });
+        });
+
+
+
+
         function toggleDesktopMenu() {
             const dm = document.getElementById("desktopMenu");
             if (dm) dm.classList.toggle("active");
@@ -211,5 +311,6 @@
             }
         });
     </script>
+    <script src="{% static 'js/notifications.js' %}"></script>
 </body>
 </html>

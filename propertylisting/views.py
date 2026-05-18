@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Properties, Favorite, PropertyImage, PropertyEditRequest, StagedImageAdd
+from .models import Properties, Favorite, PropertyImage, PropertyEditRequest, StagedImageAdd, Notification
 from .forms import PropertiesForm, PropertyEditForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
@@ -53,10 +53,17 @@ def create_property(request):
         if form.is_valid():
             property_record= form.save(commit=False)
             property_record.owner = request.user.username
-            property_record.save() 
-            # retrieve all files uploaded in the additional_images field and create a PropertyImage record for each one, linking it to the newly created property 
+            property_record.save()
+            # retrieve all files uploaded in the additional_images field and create a PropertyImage record for each one, linking it to the newly created property
             for img in request.FILES.getlist('additional_images'):
                 PropertyImage.objects.create(property=property_record, image=img)
+
+            #notification for the owner when they submit a property for review
+            Notification.objects.create(
+                user=request.user,
+                message=f"Your property (Ref: {property_record.property_ref}) has been submitted for review and approval.",
+                related_ref=property_record.property_ref,
+            )
             return redirect('properties')
     else:
         form = PropertiesForm()
@@ -131,9 +138,26 @@ def approve_property(request, property_ref, action):
     property_obj = get_object_or_404(Properties, property_ref=property_ref)
     if action == 'approve':
         property_obj.status = Properties.StatusChoices.APPROVED
+        #if admin approves the property, create a notification for the owner to inform them
+        property_obj.save()
+        owner_user = User.objects.filter(username=property_obj.owner).first()
+        if owner_user:
+            Notification.objects.create(
+                user=owner_user,
+                message=f"Your property (Ref: {property_obj.property_ref}) has been approved and is now live.",
+                related_ref=property_obj.property_ref,
+            )
     elif action == 'reject':
         property_obj.status = Properties.StatusChoices.REJECTED
-    property_obj.save()
+        #if admin rejects the property, create a notification for the owner to inform them
+        property_obj.save()
+        owner_user = User.objects.filter(username=property_obj.owner).first()
+        if owner_user:
+            Notification.objects.create(
+                user=owner_user,
+                message=f"Your property (Ref: {property_obj.property_ref}) has been rejected.",
+                related_ref=property_obj.property_ref,
+            )
     return redirect('admin_dashboard')
 
 #---owner dashboard: track own property submissions---#
@@ -178,6 +202,7 @@ def my_properties(request):
         "favorites_count": len(favorited_ids),
     })
 
+# when property owner clicks "Request Deletion", the property status changes to "Pending Delete" and a notification is sent to admin
 @require_POST
 @login_required
 def request_deletion(request, property_ref):
@@ -189,6 +214,14 @@ def request_deletion(request, property_ref):
         property_obj.previous_status = property_obj.status
         property_obj.status = Properties.StatusChoices.PENDING_DELETE
         property_obj.save()
+        #Notification
+        owner_user = User.objects.filter(username=property_obj.owner).first()
+        if owner_user:
+            Notification.objects.create(
+                user=owner_user,
+                message=f"Your property (Ref: {property_obj.property_ref}) has been requested for deletion.",
+                related_ref=property_obj.property_ref,
+            )
     return redirect('my_submissions')
 
 #---owner cancels their own pending deletion request---#
@@ -212,10 +245,26 @@ def process_deletion(request, property_ref, action):
     property_obj = get_object_or_404(Properties, property_ref=property_ref)
     if action == 'confirm':
         property_obj.delete()
+        #notification
+        owner_user = User.objects.filter(username=property_obj.owner).first()
+        if owner_user:
+            Notification.objects.create(
+                user=owner_user,
+                message=f"Your property (Ref: {property_obj.property_ref}) has been deleted by admin.",
+                related_ref=property_obj.property_ref,
+            )
     elif action == 'reject':
         property_obj.status = property_obj.previous_status
         property_obj.previous_status = ''
         property_obj.save()
+
+        owner_user = User.objects.filter(username=property_obj.owner).first()
+        if owner_user:
+            Notification.objects.create(
+                user=owner_user,
+                message=f"Your request to delete property (Ref: {property_obj.property_ref}) has been rejected.",
+                related_ref=property_obj.property_ref,
+            )
     return redirect('admin_dashboard')
 
 #---owner submits an edit request (staged, not live until admin approves)---#
@@ -366,3 +415,19 @@ def approve_edit(request, edit_id, action):
 @login_required
 def manage_images(request, property_ref):
     return redirect('edit_property', property_ref=property_ref)
+
+#---mark a single notification as read---#
+@require_POST
+@login_required
+def mark_notification_read(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+    notification.is_read = True
+    notification.save()
+    return redirect(request.META.get('HTTP_REFERER', 'properties'))
+
+#---mark all notifications as read---#
+@require_POST
+@login_required
+def mark_all_notifications_read(request):
+    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+    return redirect(request.META.get('HTTP_REFERER', 'properties'))
